@@ -1,0 +1,54 @@
+.ratingstar,.ratingstarfull{
+    cursor:pointer;
+}
+.ratingstarfull:before{
+    content: "\2605";
+    font-size:40px;
+}
+.ratingstar:before{
+    content: "\2606";
+    font-size:40px;
+}
+
+.user-ratingstar:before{
+    content: "\2606";
+    font-size:40px;
+    color: yellow;
+    position:relative;
+    top:6px;
+}
+
+
+
+/** Eventlist **/
+.mod_eventlist .layout_upcoming .date:before {
+    position:relative;
+    top: 8px;
+}
+.mod_eventlist .layout_upcoming.future-event .date:before{
+    content: "\02022";
+    color:red;
+    font-size:40px;
+}
+.mod_eventlist .layout_upcoming.event-is-history .date:before{
+    content: "\02022";
+    color:blue;
+    font-size:40px;
+}
+.mod_eventlist .layout_upcoming.event-has-uploads .date:before{
+    content: "\02022";
+    color:yellow;
+    font-size:40px;
+}
+.mod_eventlist .layout_upcoming.event-has-ratings .date:before{
+    content: "\02022";
+    color:green;
+    font-size:40px;
+}
+
+
+/** Styling for fineuploader **/
+.qq-uploader-selector {
+    width: 100%;
+    border: 3px dashed #ccc;
+}

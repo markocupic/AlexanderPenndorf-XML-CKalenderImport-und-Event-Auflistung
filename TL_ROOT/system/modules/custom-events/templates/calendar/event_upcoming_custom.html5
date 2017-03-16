@@ -1,0 +1,8 @@
+<?php $strAdditionalClasses = Markocupic\Customevents\Helper::getEventListingCSSClasses($this->id); ?>
+
+<div class="event layout_upcoming<?= $this->classUpcoming ?> <?= $strAdditionalClasses ?>">
+
+<time datetime="<?= $this->datetime ?>" class="date"><?= $this->date ?><?php if ($this->time): ?>, <?= $this->time ?><?php endif; ?></time>
+<a href="<?= $this->href ?>" title="<?= $this->title ?> (<?php if ($this->day) echo $this->day . ', '; ?><?= $this->date ?><?php if ($this->time) echo ', ' . $this->time;?>)"<?= $this->target ?>><?= $this->link ?></a>
+
+</div>

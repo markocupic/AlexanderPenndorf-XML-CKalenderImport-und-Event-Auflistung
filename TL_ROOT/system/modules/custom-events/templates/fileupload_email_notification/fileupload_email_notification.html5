@@ -1,0 +1,15 @@
+Hallo <?= $this->firstname ?>
+
+
+Fuer den Event "<?= $this->eventname ?>" sind von <?= $this->logged_in_user_firstname ?> <?= $this->logged_in_user_lastname ?> soeben neue Bilder hochgeladen worden.
+
+Hier geht es zum Event:
+
+        <?= $this->href ?>
+
+
+Liebe Gruesse
+
+Administrator
+
+PS: Dies ist eine automatisch generierte Nachricht. Bitte antworten Sie nicht darauf.
