@@ -10,7 +10,7 @@
 namespace Markocupic\Customevents;
 
 
-class UploadHooks
+class Hooks
 {
     /**
      * @var string
@@ -26,28 +26,45 @@ class UploadHooks
     public function validateFormFieldHook(\Widget $objWidget, $intId, $arrForm)
     {
 
-        if (isset($_GET['auto_item']) && $_GET['events'] != '') {
+        if ($_POST['FORM_SUBMIT'] && isset($_GET['auto_item']) && $_GET['events'] != '') {
 
             if ($objWidget->type == 'fineUploader') {
-
-                foreach ($objWidget->value as $uuid) {
+                foreach ($objWidget->value as $source) {
                     $objEvents = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
                     if ($objEvents !== null) {
                         // Create new event folder if it wasn't already created
                         $strFolder = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['EVENT_FOLDER'] . '/event-' . $objEvents->id . '/images';
                         new \Folder($strFolder);
 
+                        // Get fileObject
+                        if (\Validator::isUuid($source)) {
+                            $oFile = \FilesModel::findByUuid($source);
+                            if ($oFile === null) {
+                                continue;
+                            }
+                            $objFile = new \File($oFile->path);
+                        } elseif (is_file(TL_ROOT . '/' . $source)) {
+                            $objFile = new \File($source);
+                        } else {
+                            continue;
+                        }
+
+                        // Check for valide filetype
+                        if (!$objFile->isImage) {
+                            continue;
+                        }
+
                         // Move file to the event-folder
                         $blnMoved = false;
                         $i = 0;
                         while ($blnMoved === false) {
                             $i++;
-                            $objFile = \FilesModel::findByUuid($uuid);
+
                             $filename = 'file-' . $i . '.' . strtolower($objFile->extension);
                             if (!is_file(TL_ROOT . '/' . $strFolder . '/' . $filename)) {
                                 \Files::getInstance()->copy($objFile->path, $strFolder . '/' . $filename);
                                 $blnMoved = true;
-                                $objOldFile = new \File($objFile->path,false);
+                                $objOldFile = new \File($objFile->path, false);
                                 $objOldFile->delete();
                             }
                         }
@@ -94,8 +111,8 @@ class UploadHooks
     protected function getEventFromUrl()
     {
 
-            $objEvent = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
-            return $objEvent;
+        $objEvent = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
+        return $objEvent;
     }
 
     /**
@@ -105,25 +122,22 @@ class UploadHooks
      */
     protected function sendFileuploadEmailNotification($arrMembersToNotify, $objForm, $arrFiles)
     {
-        foreach($arrMembersToNotify as $memberId)
-        {
+        foreach ($arrMembersToNotify as $memberId) {
             $objMember = \MemberModel::findByPk($memberId);
-            if($objMember === null) continue;
-            if($objMember->email == '') continue;
+            if ($objMember === null) continue;
+            if ($objMember->email == '') continue;
 
             $objTemplate = new \FrontendTemplate('fileupload_email_notification');
             $objTemplate->firstname = $objMember->firstname;
 
             $objUser = \FrontendUser::getInstance();
-            if($objUser !== null)
-            {
+            if ($objUser !== null) {
                 $objTemplate->logged_in_user_firstname = $objUser->firstname;
                 $objTemplate->logged_in_user_lastname = $objUser->lastname;
             }
             $eventname = 'no eventname found';
             $objEvent = $this->getEventFromUrl();
-            if($objEvent !== null)
-            {
+            if ($objEvent !== null) {
                 $eventname = $objEvent->title;
                 $objTemplate->eventname = $eventname;
             }

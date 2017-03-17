@@ -1,4 +1,4 @@
-<?php $strAdditionalClasses = Markocupic\Customevents\Helper::getEventListingCSSClasses($this->id); ?>
+<?php $strAdditionalClasses = Markocupic\Customevents\Helpers::getEventListingCSSClasses($this->id); ?>
 
 <div class="event layout_upcoming<?= $this->classUpcoming ?> <?= $strAdditionalClasses ?>">
 

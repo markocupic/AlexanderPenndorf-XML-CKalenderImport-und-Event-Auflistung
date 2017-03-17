@@ -25,9 +25,9 @@ array_insert
 $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_calendar_events_rating';
 
 // Hooks
-$GLOBALS['TL_HOOKS']['validateFormField'][] = array('Markocupic\Customevents\UploadHooks', 'validateFormFieldHook');
+$GLOBALS['TL_HOOKS']['validateFormField'][] = array('Markocupic\Customevents\Hooks', 'validateFormFieldHook');
 // Notify members of selected groups on fileuploads
-$GLOBALS['TL_HOOKS']['processFormData'][] = array('Markocupic\Customevents\UploadHooks', 'notifyMembersOnFileupload');
+$GLOBALS['TL_HOOKS']['processFormData'][] = array('Markocupic\Customevents\Hooks', 'notifyMembersOnFileupload');
 
 // Config
 $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['EVENT_FOLDER'] = 'files/events';
@@ -36,4 +36,5 @@ $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['EVENT_FOLDER'] = 'files/events';
 if(TL_MODE == 'FE')
 {
 	$GLOBALS['TL_CSS'][] = 'system/modules/custom-events/assets/css/stylesheet.css';
+	$GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/custom-events/assets/js/custom-events.js';
 }

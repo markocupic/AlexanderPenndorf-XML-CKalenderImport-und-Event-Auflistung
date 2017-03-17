@@ -11,6 +11,6 @@
 <?php endif; ?>
 
 <?php if(FE_USER_LOGGED_IN && $this->userRating): ?>
-<div class="user-rating">Ihre Wertung: <?= Markocupic\Customevents\Helper::generateRatingIconHtml('<span class="user-ratingstar"> </span>', $this->userRating) ?></div>
+<div class="user-rating">Ihre Wertung: <?= Markocupic\Customevents\Helpers::generateRatingIconHtml('<span class="user-ratingstar"> </span>', $this->userRating) ?></div>
 <?php endif; ?>
 </div>

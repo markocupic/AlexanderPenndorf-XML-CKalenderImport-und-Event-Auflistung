@@ -9,7 +9,7 @@
 namespace Markocupic\Customevents;
 
 
-class Helper
+class Helpers
 {
     /**
      * @param $eventId

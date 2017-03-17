@@ -34,7 +34,8 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['ckal_url'] = array
 	'exclude'                 => true,
 	'search'                  => true,
 	'inputType'               => 'text',
-	'eval'                    => array('tl_class'=>'long'),
+	'explanation' 			  => 'ckal_url',
+	'eval'                    => array('tl_class'=>'long', 'helpwizard' => true),
 	'sql'                     => "text NULL"
 );
 
