@@ -34,7 +34,6 @@ class CKalenderXmlEventImport extends \System
     /**
      * Trigger the eventImport from ckalender.de in the backend
      * onSubmitCallback for tl_calendar
-     * Load events from ckalender
      * @param \DataContainer $dc
      * @throws \Exception
      */
@@ -110,11 +109,20 @@ class CKalenderXmlEventImport extends \System
         $strContent = $this->objTmpFile->getContent();
 
         // Create SimpleXML object from string
-        $xml = simplexml_load_string($strContent, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-        //$xml = simplexml_load_string($strContent, 'SimpleXMLElement');
+        libxml_use_internal_errors(true);
 
-        if (!$xml)
+        $xml = simplexml_load_string($strContent, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
+
+        // XML error handling
+        if ($xml === false)
         {
+            $errors = libxml_get_errors();
+            foreach ($errors as $error)
+            {
+                echo $this->displayXmlError($error, $xml);
+            }
+
+            libxml_clear_errors();
             $this->log('Cannot create Simple XML Object from string!', __METHOD__, TL_ERROR);
             throw new \Exception('Cannot create Simple XML Object from string!');
         }
@@ -125,6 +133,7 @@ class CKalenderXmlEventImport extends \System
         $items = 0;
         foreach ($xml->children() as $child)
         {
+            // Set the insert array
             $set = $this->getDatarecordFromXML($child, $xml, $strContent);
 
             // Call CKalenderXMLEventImportBeforeUpdateHook
@@ -169,6 +178,40 @@ class CKalenderXmlEventImport extends \System
         // Delete the temporary XML-file from the server
         $objFile = new \File($this->objTmpFile->path, false);
         $objFile->delete();
+    }
+
+
+    /**
+     * @param $error
+     * @param $xml
+     * @return string
+     */
+    protected function displayXmlError($error, $xml)
+    {
+        $return = $xml[$error->line - 1] . "\n";
+        $return .= str_repeat('-', $error->column) . "^\n";
+
+        switch ($error->level)
+        {
+            case LIBXML_ERR_WARNING:
+                $return .= "Warning $error->code: ";
+                break;
+            case LIBXML_ERR_ERROR:
+                $return .= "Error $error->code: ";
+                break;
+            case LIBXML_ERR_FATAL:
+                $return .= "Fatal Error $error->code: ";
+                break;
+        }
+
+        $return .= trim($error->message) . "\n  Line: $error->line" . "\n  Column: $error->column";
+
+        if ($error->file)
+        {
+            $return .= "\n  File: $error->file";
+        }
+
+        return "$return\n\n--------------------------------------------\n\n";
     }
 
 
@@ -229,6 +272,35 @@ class CKalenderXmlEventImport extends \System
         }
         return array();
 
+    }
+
+
+    /**
+     * Events that are created in contao habe
+     * @return int
+     */
+    public static function generateUuid()
+    {
+
+        $objDb = \Database::getInstance();
+        if (!$objDb->fieldExists('uuid', 'tl_calendar_events'))
+        {
+            return null;
+        }
+
+        // Generate uuid
+        $uuid = 1000000000;
+        $skip = false;
+        do
+        {
+            $uuid++;
+            $objCal = \CalendarEventsModel::findByUuid($uuid);
+            if ($objCal === null)
+            {
+                $skip = true;
+            }
+        } while ($skip !== true);
+        return $uuid;
     }
 
 
@@ -349,35 +421,7 @@ class CKalenderXmlEventImport extends \System
 
 
     /**
-     * Events that are created in contao habe
-     * @return int
-     */
-    public static function generateUuid()
-    {
-
-        $objDb = \Database::getInstance();
-        if (!$objDb->fieldExists('uuid', 'tl_calendar_events'))
-        {
-            return null;
-        }
-
-        // Generate uuid
-        $uuid = 1000000000;
-        $skip = false;
-        do
-        {
-            $uuid++;
-            $objCal = \CalendarEventsModel::findByUuid($uuid);
-            if ($objCal === null)
-            {
-                $skip = true;
-            }
-        } while ($skip !== true);
-        return $uuid;
-    }
-
-    /**
-     * Get the event author
+     * Get the event-author
      * @param int $uuid
      * @return int
      */
@@ -393,14 +437,14 @@ class CKalenderXmlEventImport extends \System
             }
         }
 
-        // Use the it of the logged in backend user
+        // Use the id of the logged in backend user
         if (TL_MODE == 'BE')
         {
             $objUser = \BackendUser::getInstance();
             return $objUser->id;
         }
 
-        // Set Backend-Admin as author
+        // Set backend-administrator as author
         $objUser = \Database::getInstance()->prepare('SELECT * FROM tl_user WHERE admin=?')->limit(1)->execute('1');
         if ($objUser->numRows)
         {
