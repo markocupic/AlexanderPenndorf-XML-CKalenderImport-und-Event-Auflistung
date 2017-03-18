@@ -401,7 +401,7 @@ class CKalenderXmlEventImport extends \System
         }
 
         // Set Backend-Admin as author
-        $objUser = \Database::getInstance()->prepare('SELECT * FROM tl_user WHERE isAdmin=?')->limit(1)->execute('1');
+        $objUser = \Database::getInstance()->prepare('SELECT * FROM tl_user WHERE admin=?')->limit(1)->execute('1');
         if ($objUser->numRows)
         {
             return $objUser->id;
