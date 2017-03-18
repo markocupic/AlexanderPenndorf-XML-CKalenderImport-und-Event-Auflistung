@@ -13,3 +13,8 @@ if(TL_MODE == 'FE')
     $GLOBALS['TL_HOOKS']['generatePage'][] = array('Markocupic\CKalenderXmlEventImport', 'frontendTrigger');
 }
 
+// Take influence on content when importing items to tl_calendar_events
+// $GLOBALS['TL_HOOKS']['CKalenderXMLEventImportBeforeUpdateHook'] = array('MyNamespace\MyClass', 'methodname');
+
+
+

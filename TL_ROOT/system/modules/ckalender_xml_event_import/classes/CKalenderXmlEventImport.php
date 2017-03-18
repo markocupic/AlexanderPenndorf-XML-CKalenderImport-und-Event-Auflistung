@@ -64,6 +64,11 @@ class CKalenderXmlEventImport extends \System
      */
     public function frontendTrigger()
     {
+        if (TL_MODE != 'FE')
+        {
+            return;
+        }
+
         $objCalendar = \CalendarModel::findAll();
         if ($objCalendar !== null)
         {
@@ -121,7 +126,18 @@ class CKalenderXmlEventImport extends \System
         foreach ($xml->children() as $child)
         {
             $set = $this->getDatarecordFromXML($child, $xml, $strContent);
-            if ($set['uuid'] > 0)
+
+            // Call CKalenderXMLEventImportBeforeUpdateHook
+            if (isset($GLOBALS['TL_HOOKS']['CKalenderXMLEventImportBeforeUpdateHook']) && is_array($GLOBALS['TL_HOOKS']['CKalenderXMLEventImportBeforeUpdateHook']))
+            {
+                foreach ($GLOBALS['TL_HOOKS']['CKalenderXMLEventImportBeforeUpdateHook'] as $callback)
+                {
+                    $this->import($callback[0]);
+                    $set = $this->{$callback[0]}->{$callback[1]}();
+                }
+            }
+
+            if (isset($set) && is_array($set) && $set['uuid'] > 0)
             {
                 $items++;
                 $set['pid'] = $this->calendarId;
@@ -179,13 +195,12 @@ class CKalenderXmlEventImport extends \System
         $set['endTime'] = (int)$endDate;
         $set['addTime'] = '';
         $set['source'] = 'default';
-        $set['author'] = 0;
+        $set['author'] = $this->getAuthor((int)$child->ID);
         $set['tstamp'] = time();
         $set['notiz'] = $this->getCorrectStringValue($child->Notiz);
         $set['verantwortlich'] = $this->getCorrectStringValue($child->Verantwortlich);
         $set['benutzergruppe'] = $this->getCorrectStringValue($child->Benutzergruppe);
         $set['text'] = $this->getCorrectStringValue($child->Text);
-
 
         if ($child->Zeitangabe != '')
         {
@@ -233,15 +248,19 @@ class CKalenderXmlEventImport extends \System
      * @param $url
      * @return mixed
      */
-    protected function replaceWildcardsInUrl($url)
+    protected function replaceWildcardsInUrl($strUrl)
     {
         $pattern = '/\#\#\#([+|-])(.*\d)days\#\#\#/iU';
-        $url = preg_replace_callback($pattern, function ($match)
+        if (preg_match($pattern, $strUrl))
         {
-            //date('d.m.Y', strtotime("+30 days"));
-            return \Date::parse('d.m.Y', strtotime($match[1] . $match[2] . ' days'));
-        }, $url);
-        return $url;
+            $strUrl = preg_replace_callback($pattern, function ($match)
+            {
+                //date('d.m.Y', strtotime("+30 days"));
+                return \Date::parse('d.m.Y', strtotime($match[1] . $match[2] . ' days'));
+            }, $strUrl);
+        }
+
+        return $strUrl;
     }
 
 
@@ -330,18 +349,20 @@ class CKalenderXmlEventImport extends \System
 
 
     /**
+     * Events that are created in contao habe
      * @return int
      */
     public static function generateUuid()
     {
-        $arrFields = \Database::getInstance()->listFields('tl_calendar_events');
-        if (!in_array('uuid', $arrFields))
+
+        $objDb = \Database::getInstance();
+        if (!$objDb->fieldExists('uuid', 'tl_calendar_events'))
         {
             return null;
         }
 
         // Generate uuid
-        $uuid = 9000000000;
+        $uuid = 1000000000;
         $skip = false;
         do
         {
@@ -353,5 +374,40 @@ class CKalenderXmlEventImport extends \System
             }
         } while ($skip !== true);
         return $uuid;
+    }
+
+    /**
+     * Get the event author
+     * @param int $uuid
+     * @return int
+     */
+    protected function getAuthor($uuid = 0)
+    {
+        // Do not overwrite author, if it is already set
+        $objEvent = \CalendarEventsModel::findByUuid($uuid);
+        if ($objEvent !== null)
+        {
+            if ($objEvent->author > 0)
+            {
+                return $objEvent->author;
+            }
+        }
+
+        // Use the it of the logged in backend user
+        if (TL_MODE == 'BE')
+        {
+            $objUser = \BackendUser::getInstance();
+            return $objUser->id;
+        }
+
+        // Set Backend-Admin as author
+        $objUser = \Database::getInstance()->prepare('SELECT * FROM tl_user WHERE isAdmin=?')->limit(1)->execute('1');
+        if ($objUser->numRows)
+        {
+            return $objUser->id;
+        }
+
+        // default
+        return 0;
     }
 }
