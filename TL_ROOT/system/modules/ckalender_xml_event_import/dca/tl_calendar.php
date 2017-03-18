@@ -9,7 +9,7 @@
 
 
 // Callbacks
-$GLOBALS['TL_DCA']['tl_calendar']['config']['onsubmit_callback'][] = array('Markocupic\CKalenderXmlEventImport', 'updateCalendarsFromXMLOnSubmit');
+$GLOBALS['TL_DCA']['tl_calendar']['config']['onsubmit_callback'][] = array('Markocupic\CKalenderXmlEventImport', 'backendTrigger');
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar']['palettes']['default'] . ';{ckal_legend:hide},ckal_source';

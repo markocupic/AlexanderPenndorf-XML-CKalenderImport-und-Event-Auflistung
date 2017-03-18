@@ -13,30 +13,38 @@ class CKalenderXmlEventImport extends \System
 {
     /**
      * @var string
+     * stored in tl_calendar.ckal_url
      */
     protected $ckal_url = null;
 
-    /**
-     * @var null
-     */
-    protected $tmpFile = null;
 
     /**
      * @var null
+     */
+    protected $objTmpFile = null;
+
+
+    /**
+     * @var null
+     * tl_calendar.id
      */
     protected $calendarId = null;
 
+
     /**
+     * Trigger the eventImport from ckalender.de in the backend
      * onSubmitCallback for tl_calendar
      * Load events from ckalender
      * @param \DataContainer $dc
      * @throws \Exception
      */
-    public function updateCalendarsFromXMLOnSubmit(\DataContainer $dc)
+    public function backendTrigger(\DataContainer $dc)
     {
         $objCalendar = \Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=?')->execute($dc->id);
-        if ($objCalendar->numRows) {
-            if ($objCalendar->ckal_source && $objCalendar->ckal_url != '') {
+        if ($objCalendar->numRows)
+        {
+            if ($objCalendar->ckal_source && $objCalendar->ckal_url != '')
+            {
                 $oCalendar = \CalendarModel::findByPk($dc->id);
                 $oCalendar->ckal_last_reload = time();
                 $oCalendar->save();
@@ -51,16 +59,21 @@ class CKalenderXmlEventImport extends \System
 
 
     /**
-     * Generate page Hook
+     * Trigger the eventImport from ckalender.de in the frontend
+     * GeneratePage Hook
      */
-    public function updateCalendarsFromXML()
+    public function frontendTrigger()
     {
         $objCalendar = \CalendarModel::findAll();
-        if ($objCalendar !== null) {
-            while ($objCalendar->next()) {
-                if ($objCalendar->ckal_source && $objCalendar->ckal_url != '') {
+        if ($objCalendar !== null)
+        {
+            while ($objCalendar->next())
+            {
+                if ($objCalendar->ckal_source && $objCalendar->ckal_url != '')
+                {
 
-                    if (($objCalendar->ckal_last_reload + $objCalendar->ckal_cache) < time() || $objCalendar->ckal_cache < 1) {
+                    if (($objCalendar->ckal_last_reload + $objCalendar->ckal_cache) < time() || $objCalendar->ckal_cache < 1)
+                    {
                         $objCalendar->ckal_last_reload = time();
                         $objCalendar->save();
                         $this->ckal_url = $objCalendar->ckal_url;
@@ -68,7 +81,8 @@ class CKalenderXmlEventImport extends \System
 
                         // Launch import
                         $this->importXmlFromUrl();
-                        if ($objCalendar->ckal_cache > 30 && TL_MODE == 'FE') {
+                        if ($objCalendar->ckal_cache > 30 && TL_MODE == 'FE')
+                        {
                             \Controller::reload();
                         }
                     }
@@ -85,16 +99,17 @@ class CKalenderXmlEventImport extends \System
     {
         // Prepare url
         $url = html_entity_decode($this->ckal_url);
-        $url = $this->replaceWildcardsInCkalUrl($url);
+        $url = $this->replaceWildcardsInUrl($url);
 
-        $this->tmpFile = $this->downloadURLToTempFile($url);
-        $strContent = $this->tmpFile->getContent();
+        $this->objTmpFile = $this->downloadURLToTempFile($url);
+        $strContent = $this->objTmpFile->getContent();
 
         // Create SimpleXML object from string
         $xml = simplexml_load_string($strContent, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
         //$xml = simplexml_load_string($strContent, 'SimpleXMLElement');
 
-        if (!$xml) {
+        if (!$xml)
+        {
             $this->log('Cannot create Simple XML Object from string!', __METHOD__, TL_ERROR);
             throw new \Exception('Cannot create Simple XML Object from string!');
         }
@@ -103,29 +118,43 @@ class CKalenderXmlEventImport extends \System
         \Database::getInstance()->prepare('UPDATE tl_calendar_events SET published=? WHERE pid=?')->execute('', $this->calendarId);
 
         $items = 0;
-        foreach ($xml->children() as $child) {
+        foreach ($xml->children() as $child)
+        {
             $set = $this->getDatarecordFromXML($child, $xml, $strContent);
-            if ($set['uuid'] > 0) {
+            if ($set['uuid'] > 0)
+            {
                 $items++;
                 $set['pid'] = $this->calendarId;
                 $set['published'] = '1';
                 $objEvent = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE uuid=? LIMIT 0,1')->execute($set['uuid']);
-                if ($objEvent->numRows) {
+                if ($objEvent->numRows)
+                {
                     \Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
-                } else {
+                }
+                else
+                {
                     \Database::getInstance()->prepare('INSERT INTO tl_calendar_events %s')->set($set)->execute();
                 }
             }
         }
-        if ($items > 0) {
+        if ($items > 0)
+        {
             $this->log('Reloaded ' . $items . ' Events from ckalender to tl_calendar with ID: ' . $this->calendarId, __METHOD__, TL_GENERAL);
-            if (TL_MODE == 'FE') {
+            if (TL_MODE == 'FE')
+            {
                 \Controller::reload();
             }
-        } else {
+        }
+        else
+        {
             $this->log('Reloaded ' . $items . ' Events from ckalender to tl_calendar with ID: ' . $this->calendarId . '. Check for proper XML-handling', __METHOD__, TL_ERROR);
         }
+
+        // Delete the temporary XML-file from the server
+        $objFile = new \File($this->objTmpFile->path, false);
+        $objFile->delete();
     }
+
 
     /**
      * @param $child
@@ -158,28 +187,35 @@ class CKalenderXmlEventImport extends \System
         $set['text'] = $this->getCorrectStringValue($child->Text);
 
 
-        if ($child->Zeitangabe != '') {
+        if ($child->Zeitangabe != '')
+        {
             $arrTime = explode('-', $child->Zeitangabe);
-            if (isset($arrTime[0])) {
-                if ($arrTime[0] > 0 && $arrTime[0] <= 24) {
+            if (isset($arrTime[0]))
+            {
+                if ($arrTime[0] > 0 && $arrTime[0] <= 24)
+                {
                     $set['startTime'] = (int)($startDate + $arrTime[0] * 3600);
                     $set['addTime'] = '1';
                 }
             }
-            if (isset($arrTime[1])) {
-                if ($arrTime[1] > 0 && $arrTime[1] <= 24) {
+            if (isset($arrTime[1]))
+            {
+                if ($arrTime[1] > 0 && $arrTime[1] <= 24)
+                {
                     $set['endTime'] = (int)($endDate + $arrTime[1] * 3600);
                     $set['addTime'] = '1';
                 }
             }
         }
-        if ($set['uuid'] > 0) {
+        if ($set['uuid'] > 0)
+        {
             return $set;
 
         }
         return array();
 
     }
+
 
     /**
      * @param $strDate
@@ -192,19 +228,22 @@ class CKalenderXmlEventImport extends \System
         return $dateobj->timestamp;
     }
 
+
     /**
      * @param $url
      * @return mixed
      */
-    protected function replaceWildcardsInCkalUrl($url)
+    protected function replaceWildcardsInUrl($url)
     {
         $pattern = '/\#\#\#([+|-])(.*\d)days\#\#\#/iU';
-        $url = preg_replace_callback($pattern, function ($match) {
+        $url = preg_replace_callback($pattern, function ($match)
+        {
             //date('d.m.Y', strtotime("+30 days"));
             return \Date::parse('d.m.Y', strtotime($match[1] . $match[2] . ' days'));
         }, $url);
         return $url;
     }
+
 
     /**
      * @param string $title
@@ -217,6 +256,7 @@ class CKalenderXmlEventImport extends \System
         return $alias . $uuid;
     }
 
+
     /**
      * @param $url
      * @return \File
@@ -225,17 +265,21 @@ class CKalenderXmlEventImport extends \System
     protected function downloadURLToTempFile($url)
     {
         $url = html_entity_decode($url);
-        if ($this->isCurlInstalled()) {
+        if ($this->isCurlInstalled())
+        {
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            if (preg_match("/^https/", $url)) {
+            if (preg_match("/^https/", $url))
+            {
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             }
             curl_setopt($ch, CURLOPT_HEADER, 0);
             $content = curl_exec($ch);
             curl_close($ch);
-        } else {
+        }
+        else
+        {
             $this->log('The CURL extension is not installed!', __METHOD__, TL_ERROR);
             throw new \Exception('The CURL extension is not installed!');
             $content = file_get_contents($url);
@@ -247,17 +291,22 @@ class CKalenderXmlEventImport extends \System
         return $objFile;
     }
 
+
     /**
      * @return bool
      */
     private function isCurlInstalled()
     {
-        if (in_array('curl', get_loaded_extensions())) {
+        if (in_array('curl', get_loaded_extensions()))
+        {
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
+
 
     /**
      * @param $value
@@ -265,14 +314,20 @@ class CKalenderXmlEventImport extends \System
      */
     private function getCorrectStringValue($value)
     {
-        if (!isset($value)) {
+        if (!isset($value))
+        {
             return '';
-        } elseif ($value != '') {
+        }
+        elseif ($value != '')
+        {
             return (string)$value;
-        } else {
+        }
+        else
+        {
             return '';
         }
     }
+
 
     /**
      * @return int
@@ -280,17 +335,20 @@ class CKalenderXmlEventImport extends \System
     public static function generateUuid()
     {
         $arrFields = \Database::getInstance()->listFields('tl_calendar_events');
-        if (!in_array('uuid', $arrFields)) {
+        if (!in_array('uuid', $arrFields))
+        {
             return null;
         }
 
         // Generate uuid
         $uuid = 9000000000;
         $skip = false;
-        do {
+        do
+        {
             $uuid++;
             $objCal = \CalendarEventsModel::findByUuid($uuid);
-            if ($objCal === null) {
+            if ($objCal === null)
+            {
                 $skip = true;
             }
         } while ($skip !== true);

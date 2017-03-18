@@ -10,6 +10,6 @@
 // config.php
 if(TL_MODE == 'FE')
 {
-    $GLOBALS['TL_HOOKS']['generatePage'][] = array('Markocupic\CKalenderXmlEventImport', 'updateCalendarsFromXML');
+    $GLOBALS['TL_HOOKS']['generatePage'][] = array('Markocupic\CKalenderXmlEventImport', 'frontendTrigger');
 }
 
