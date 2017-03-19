@@ -38,7 +38,7 @@ Mit diesem Frontend-Modul lassen sich die Event-Ratings anzeigen (Durchschnittsw
 
 ## Eventlisting und Eventreader Templates
 
-### Eventlisting
+### Eventlisting-Template (event_upcoming_custom)
 ![Event Listing Template](manual/images/event_listing_template.png?raw=true "Event Listing Template")
 Wird das im Modul genutzte Event-Auflistungs-Modul genutzt, werden die Events mit einem farbigen Punkt hervorgehoben.
 
@@ -47,7 +47,7 @@ Wird das im Modul genutzte Event-Auflistungs-Modul genutzt, werden die Events mi
 - grüner Punkt: Event wurde bewertet.
 
 
-### Eventreader Template
+### Eventreader-Template (event_full_custom)
 ![Event Reader Template](manual/images/event_reader_template.png?raw=true "Event Reader Template")
-Das mitgelieferte Event-Reader Template ermöglicht die Darstellung von weiteren Feldern, welche aus Ckalender importiert wurden.
+Das mitgelieferte Event-Reader Template ermöglicht die Ausgabe von weiteren Feldern, welche aus Ckalender importiert wurden.
 
