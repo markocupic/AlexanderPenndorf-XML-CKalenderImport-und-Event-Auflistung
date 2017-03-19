@@ -30,7 +30,7 @@ class Hooks
         if ($_POST['FORM_SUBMIT'] && isset($_GET['auto_item']) && $_GET['events'] != '')
         {
             // Support for contao core fileupload, Dropzone and Fineuplaoder
-            if (isset($_SESSION['FORM_DATA']['event_image_uploader']) || isset($_SESSION['FORM_DATA']['event_image_uploader_fineuploader']))
+            if (isset($arrFiles['event_image_uploader']) || isset($_SESSION['FORM_DATA']['event_image_uploader']) || isset($_SESSION['FORM_DATA']['event_image_uploader_fineuploader']))
             {
                 if (count($arrFiles) > 0)
                 {
