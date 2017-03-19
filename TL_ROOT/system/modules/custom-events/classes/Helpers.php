@@ -90,7 +90,7 @@ class Helpers
     public static function generateRatingIconHtml($html, $loop = 0)
     {
         $strHtml = '';
-        for($i=0; $i<= $loop; $i++)
+        for ($i = 0; $i <= $loop; $i++)
         {
             $strHtml .= $html;
         }

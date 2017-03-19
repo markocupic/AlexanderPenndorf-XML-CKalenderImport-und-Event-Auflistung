@@ -32,7 +32,8 @@ class CalendarEventsRatingModel extends \Model
     public static function getUserRating($userId, $eventId)
     {
         $objRating = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_rating WHERE memberId=? AND pid=? LIMIT 0,1')->execute($userId, $eventId);
-        if ($objRating->numRows) {
+        if ($objRating->numRows)
+        {
             return $objRating->rating;
         }
         return null;

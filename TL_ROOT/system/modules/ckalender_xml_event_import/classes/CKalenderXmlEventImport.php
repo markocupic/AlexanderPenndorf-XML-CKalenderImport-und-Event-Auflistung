@@ -39,19 +39,22 @@ class CKalenderXmlEventImport extends \System
      */
     public function backendTrigger(\DataContainer $dc)
     {
-        $objCalendar = \Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=?')->execute($dc->id);
-        if ($objCalendar->numRows)
+        if(TL_MODE == 'BE' && \Input::post('FORM_SUBMIT') == 'tl_calendar')
         {
-            if ($objCalendar->ckal_source && $objCalendar->ckal_url != '')
+            $objCalendar = \Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=?')->execute($dc->id);
+            if ($objCalendar->numRows)
             {
-                $oCalendar = \CalendarModel::findByPk($dc->id);
-                $oCalendar->ckal_last_reload = time();
-                $oCalendar->save();
-                $this->ckal_url = $oCalendar->ckal_url;
-                $this->calendarId = $oCalendar->id;
+                if ($objCalendar->ckal_source && $objCalendar->ckal_url != '')
+                {
+                    $oCalendar = \CalendarModel::findByPk($dc->id);
+                    $oCalendar->ckal_last_reload = time();
+                    $oCalendar->save();
+                    $this->ckal_url = $oCalendar->ckal_url;
+                    $this->calendarId = $oCalendar->id;
 
-                // Launch import
-                $this->importXmlFromUrl();
+                    // Launch import
+                    $this->importXmlFromUrl();
+                }
             }
         }
     }
@@ -76,7 +79,7 @@ class CKalenderXmlEventImport extends \System
                 if ($objCalendar->ckal_source && $objCalendar->ckal_url != '')
                 {
 
-                    if (($objCalendar->ckal_last_reload + $objCalendar->ckal_cache) < time() || $objCalendar->ckal_cache < 1)
+                    if (($objCalendar->ckal_last_reload + $objCalendar->ckal_interval) < time() || $objCalendar->ckal_interval < 1)
                     {
                         $objCalendar->ckal_last_reload = time();
                         $objCalendar->save();
@@ -85,7 +88,7 @@ class CKalenderXmlEventImport extends \System
 
                         // Launch import
                         $this->importXmlFromUrl();
-                        if ($objCalendar->ckal_cache > 30 && TL_MODE == 'FE')
+                        if ($objCalendar->ckal_interval > 30 && TL_MODE == 'FE')
                         {
                             \Controller::reload();
                         }
@@ -106,12 +109,12 @@ class CKalenderXmlEventImport extends \System
         $url = $this->replaceWildcardsInUrl($url);
 
         $this->objTmpFile = $this->downloadURLToTempFile($url);
-        $strContent = $this->objTmpFile->getContent();
+        $xmlString = $this->objTmpFile->getContent();
 
         // Create SimpleXML object from string
         libxml_use_internal_errors(true);
 
-        $xml = simplexml_load_string($strContent, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
+        $xml = simplexml_load_string($xmlString, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
 
         // XML error handling
         if ($xml === false)
@@ -134,7 +137,7 @@ class CKalenderXmlEventImport extends \System
         foreach ($xml->children() as $child)
         {
             // Set the insert array
-            $set = $this->getDatarecordFromXML($child, $xml, $strContent);
+            $arrSet = $this->getDatarecordFromXML($child, $xml, $xmlString);
 
             // Call CKalenderXMLEventImportBeforeUpdateHook
             if (isset($GLOBALS['TL_HOOKS']['CKalenderXMLEventImportBeforeUpdateHook']) && is_array($GLOBALS['TL_HOOKS']['CKalenderXMLEventImportBeforeUpdateHook']))
@@ -142,23 +145,23 @@ class CKalenderXmlEventImport extends \System
                 foreach ($GLOBALS['TL_HOOKS']['CKalenderXMLEventImportBeforeUpdateHook'] as $callback)
                 {
                     $this->import($callback[0]);
-                    $set = $this->{$callback[0]}->{$callback[1]}();
+                    $arrSet = $this->{$callback[0]}->{$callback[1]}($arrSet, $child, $xml, $xmlString);
                 }
             }
 
-            if (isset($set) && is_array($set) && $set['uuid'] > 0)
+            if (isset($arrSet) && is_array($arrSet) && $arrSet['uuid'] > 0)
             {
                 $items++;
-                $set['pid'] = $this->calendarId;
-                $set['published'] = '1';
-                $objEvent = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE uuid=? LIMIT 0,1')->execute($set['uuid']);
+                $arrSet['pid'] = $this->calendarId;
+                $arrSet['published'] = '1';
+                $objEvent = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE uuid=? LIMIT 0,1')->execute($arrSet['uuid']);
                 if ($objEvent->numRows)
                 {
-                    \Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($set)->execute($objEvent->id);
+                    \Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objEvent->id);
                 }
                 else
                 {
-                    \Database::getInstance()->prepare('INSERT INTO tl_calendar_events %s')->set($set)->execute();
+                    \Database::getInstance()->prepare('INSERT INTO tl_calendar_events %s')->set($arrSet)->execute();
                 }
             }
         }
@@ -218,32 +221,32 @@ class CKalenderXmlEventImport extends \System
     /**
      * @param $child
      * @param $xml
-     * @param $strContent
+     * @param $xmlString
      * @return array
      */
-    protected function getDatarecordFromXML($child, $xml, $strContent)
+    protected function getDatarecordFromXML($child, $xml, $xmlString)
     {
         $startDate = $this->getTimestamp($child->Von, 'd.m.Y');
         $endDate = $this->getTimestamp($child->Bis, 'd.m.Y');
 
-        $set = array();
-        $set['uuid'] = (int)$child->ID;
-        $set['title'] = (string)$child->Titel;
-        $set['alias'] = $this->generateAlias($child->Titel, $child->ID);
-        $set['location'] = (string)$child->Ort;
-        $set['location'] = (string)$child->Ort;
-        $set['startDate'] = (int)$startDate;
-        $set['endDate'] = (int)$endDate;
-        $set['startTime'] = (int)$startDate;
-        $set['endTime'] = (int)$endDate;
-        $set['addTime'] = '';
-        $set['source'] = 'default';
-        $set['author'] = $this->getAuthor((int)$child->ID);
-        $set['tstamp'] = time();
-        $set['notiz'] = $this->getCorrectStringValue($child->Notiz);
-        $set['verantwortlich'] = $this->getCorrectStringValue($child->Verantwortlich);
-        $set['benutzergruppe'] = $this->getCorrectStringValue($child->Benutzergruppe);
-        $set['text'] = $this->getCorrectStringValue($child->Text);
+        $arrSet = array();
+        $arrSet['uuid'] = (int)$child->ID;
+        $arrSet['title'] = (string)$child->Titel;
+        $arrSet['alias'] = $this->generateAlias($child->Titel, $child->ID);
+        $arrSet['location'] = (string)$child->Ort;
+        $arrSet['location'] = (string)$child->Ort;
+        $arrSet['startDate'] = (int)$startDate;
+        $arrSet['endDate'] = (int)$endDate;
+        $arrSet['startTime'] = (int)$startDate;
+        $arrSet['endTime'] = (int)$endDate;
+        $arrSet['addTime'] = '';
+        $arrSet['source'] = 'default';
+        $arrSet['author'] = $this->getAuthor((int)$child->ID);
+        $arrSet['tstamp'] = time();
+        $arrSet['notiz'] = $this->getCorrectStringValue($child->Notiz);
+        $arrSet['verantwortlich'] = $this->getCorrectStringValue($child->Verantwortlich);
+        $arrSet['benutzergruppe'] = $this->getCorrectStringValue($child->Benutzergruppe);
+        $arrSet['text'] = $this->getCorrectStringValue($child->Text);
 
         if ($child->Zeitangabe != '')
         {
@@ -252,22 +255,22 @@ class CKalenderXmlEventImport extends \System
             {
                 if ($arrTime[0] > 0 && $arrTime[0] <= 24)
                 {
-                    $set['startTime'] = (int)($startDate + $arrTime[0] * 3600);
-                    $set['addTime'] = '1';
+                    $arrSet['startTime'] = (int)($startDate + $arrTime[0] * 3600);
+                    $arrSet['addTime'] = '1';
                 }
             }
             if (isset($arrTime[1]))
             {
                 if ($arrTime[1] > 0 && $arrTime[1] <= 24)
                 {
-                    $set['endTime'] = (int)($endDate + $arrTime[1] * 3600);
-                    $set['addTime'] = '1';
+                    $arrSet['endTime'] = (int)($endDate + $arrTime[1] * 3600);
+                    $arrSet['addTime'] = '1';
                 }
             }
         }
-        if ($set['uuid'] > 0)
+        if ($arrSet['uuid'] > 0)
         {
-            return $set;
+            return $arrSet;
 
         }
         return array();

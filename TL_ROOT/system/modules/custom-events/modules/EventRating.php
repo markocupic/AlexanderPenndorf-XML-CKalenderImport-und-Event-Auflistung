@@ -39,10 +39,12 @@ class EventRating extends \Module
      */
     public function generate()
     {
-        if (TL_MODE == 'BE') {
+        if (TL_MODE == 'BE')
+        {
             /** @var \BackendTemplate|object $objTemplate */
             $objTemplate = new \BackendTemplate('be_wildcard');
-            if (version_compare(VERSION . '.' . BUILD, '4.0.0', '<')) {
+            if (version_compare(VERSION . '.' . BUILD, '4.0.0', '<'))
+            {
                 $objTemplate->wildcard = '### ' . utf8_strtoupper($GLOBALS['TL_LANG']['FMD']['event_rating'][0]) . ' ###';
             }
             $objTemplate->title = $this->headline;
@@ -54,22 +56,26 @@ class EventRating extends \Module
         }
 
         // Overwrite default template
-        if ($this->eventRatingTpl != '') {
+        if ($this->eventRatingTpl != '')
+        {
             $this->strTemplate = $this->eventRatingTpl;
         }
 
         // Insert Rating
-        if (FE_USER_LOGGED_IN && $_POST['FORM_SUBMIT'] == 'formEventRating' && is_numeric($_POST['rating']) && $_POST['rating'] > 0 && $_POST['rating'] < 6 && isset($_GET['auto_item']) && $_GET['events'] != '') {
+        if (FE_USER_LOGGED_IN && $_POST['FORM_SUBMIT'] == 'formEventRating' && is_numeric($_POST['rating']) && $_POST['rating'] > 0 && $_POST['rating'] < 6 && isset($_GET['auto_item']) && $_GET['events'] != '')
+        {
             $objEvents = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
-            if ($objEvents !== null) {
+            if ($objEvents !== null)
+            {
                 $objUser = \FrontendUser::getInstance();
                 $objRating = $this->Database->prepare('SELECT * FROM tl_calendar_events_rating WHERE memberId=? AND pid=?')->execute($objUser->id, $objEvents->id);
-                if (!$objRating->numRows) {
+                if (!$objRating->numRows)
+                {
                     $set = array(
                         'memberId' => $objUser->id,
-                        'pid' => $objEvents->id,
-                        'tstamp' => time(),
-                        'rating' => (int)$_POST['rating'],
+                        'pid'      => $objEvents->id,
+                        'tstamp'   => time(),
+                        'rating'   => (int)$_POST['rating'],
                     );
                     $this->Database->prepare('INSERT INTO tl_calendar_events_rating %s')->set($set)->execute();
                     $this->reload();
@@ -78,21 +84,26 @@ class EventRating extends \Module
         }
 
         // Show Form to Logged in users only!
-        if (!FE_USER_LOGGED_IN) {
+        if (!FE_USER_LOGGED_IN)
+        {
             return '';
         }
 
         $this->objUser = \FrontendUser::getInstance();
 
         $objEvent = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
-        if ($objEvent !== null) {
+        if ($objEvent !== null)
+        {
             $this->objEvent = $objEvent;
-        } else {
+        }
+        else
+        {
             return '';
         }
 
         // Do not show rating html, if event hasn't finished
-        if ($this->objEvent->endDate > time()) {
+        if ($this->objEvent->endDate > time())
+        {
             return '';
         }
 

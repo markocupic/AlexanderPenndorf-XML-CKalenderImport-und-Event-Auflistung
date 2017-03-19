@@ -49,9 +49,9 @@ class EventGallery extends \Module
             return $objTemplate->parse();
         }
 
-        if(\Environment::get('isAjaxRequest') && \Input::get('file') != '' && \Input::get('delete_file') && FE_USER_LOGGED_IN)
+        if (\Environment::get('isAjaxRequest') && \Input::get('file') != '' && \Input::get('delete_file') && FE_USER_LOGGED_IN)
         {
-            if(file_exists(TL_ROOT . '/' . \Input::get('file')))
+            if (file_exists(TL_ROOT . '/' . \Input::get('file')))
             {
                 $objFiles = new \File(\Input::get('file'));
                 $objFiles->delete();
@@ -68,7 +68,7 @@ class EventGallery extends \Module
         }
 
         $this->arrFiles = $this->getEventImagesFromUrl();
-        if(count($this->arrFiles) < 1)
+        if (count($this->arrFiles) < 1)
         {
             return 'Noch keine Bilder';
         }

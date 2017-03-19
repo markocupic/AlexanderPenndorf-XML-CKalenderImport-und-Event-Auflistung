@@ -14,7 +14,7 @@ $GLOBALS['TL_DCA']['tl_calendar']['config']['onsubmit_callback'][] = array('Mark
 // Palettes
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar']['palettes']['default'] . ';{ckal_legend:hide},ckal_source';
 $GLOBALS['TL_DCA']['tl_calendar']['palettes']['__selector__'][] = 'ckal_source';
-$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['ckal_source'] = 'ckal_url,ckal_cache';
+$GLOBALS['TL_DCA']['tl_calendar']['subpalettes']['ckal_source'] = 'ckal_url,ckal_interval';
 
 
 // Fields
@@ -39,9 +39,9 @@ $GLOBALS['TL_DCA']['tl_calendar']['fields']['ckal_url'] = array
 	'sql'                     => "text NULL"
 );
 
-$GLOBALS['TL_DCA']['tl_calendar']['fields']['ckal_cache'] = array
+$GLOBALS['TL_DCA']['tl_calendar']['fields']['ckal_interval'] = array
 (
-	'label'                   => &$GLOBALS['TL_LANG']['tl_calendar']['ckal_cache'],
+	'label'                   => &$GLOBALS['TL_LANG']['tl_calendar']['ckal_interval'],
 	'default'                 => 86400,
 	'exclude'                 => true,
 	'search'                  => true,
