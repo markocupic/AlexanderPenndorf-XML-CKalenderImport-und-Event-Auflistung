@@ -25,6 +25,9 @@ Bei Uploads kann im Formular die E-Mail-Benachrichtigung für ausgewählte Fronten
 ![Bildupload Formularfeld](manual/images/fileupload_field.png?raw=true "Bildupload Formularfeld")
 Wichtig!!! Die Einstellungen für das Bildupload Formularfeld. Der Feldname muss zwingend **"event_image_uploader"** heissen! Als Uploadverzeichnis kann irgend ein Ordner gewählt werden,. Der Ordner dient lediglich als temporärer Zwischenspeicher. Die Bilder werden nach dem Upload nach files/events/event-id verschoben.
 
+
+
+
 ## Frontend Module
 
 ### Event-Galerie
@@ -40,7 +43,7 @@ Mit diesem Frontend-Modul lassen sich die Event-Ratings anzeigen (Durchschnittsw
 
 ### Eventlisting-Template (event_upcoming_custom)
 ![Event Listing Template](manual/images/event_listing_template.png?raw=true "Event Listing Template")
-Wird das im Modul genutzte Event-Auflistungs-Modul genutzt, werden die Events mit einem farbigen Punkt hervorgehoben.
+Wird das mitgelieferte Event-Auflistungs-Tempalte genutzt, werden die Events mit einem farbigen Punkt hervorgehoben.
 
 - roter Punkt: Event noch nicht durchgeführt
 - gelber Punkt: Event mit Bilduploads
@@ -49,5 +52,5 @@ Wird das im Modul genutzte Event-Auflistungs-Modul genutzt, werden die Events mi
 
 ### Eventreader-Template (event_full_custom)
 ![Event Reader Template](manual/images/event_reader_template.png?raw=true "Event Reader Template")
-Das mitgelieferte Event-Reader Template ermöglicht die Ausgabe von weiteren Feldern, welche aus Ckalender importiert wurden.
+Das mitgelieferte Event-Reader Template ermöglicht die Ausgabe von weiteren Feldern, welche aus Ckalender.de importiert wurden.
 
