@@ -17,7 +17,7 @@ Dieses Modul erweitert das Contao Kalender Modul um weitere Funktionalitäten. Es
 ### Bildupload in der Detailansicht des Events.
 Angemeldete Benutzer können zum ausgewählten Event Bilder hochladen. Die Bilder werden nach dem Upload ins Verzeichnis files/events/event-id verschoben.
 Das Verzeichnis kann in der config.php des Moduls angepasst werden.
-Diese Bilder können dann mit dem dafür angefertigten Modul in der Detailansicht angezeigt werden. Bilder können direkt aus dem Frontend auch wieder gelöscht werden. Für den Upload muss im Formulargenerator ein Formular erstellt werden. Als Fileuploader wählt man den Fineuploader.
+Diese Bilder können dann mit dem dafür angefertigten Modul in der Detailansicht angezeigt werden. Bilder können direkt aus dem Frontend auch wieder gelöscht werden. Für den Upload muss im Formulargenerator ein Formular erstellt werden. Als Fileuploader wählt man Fineuploader, Dropzone oder den Contao Core Fileuploader.
 
 ![Upload-Formular](manual/images/upload_form.png?raw=true "Upload-Formular")
 Bei Uploads kann im Formular die E-Mail-Benachrichtigung für ausgewählte Frontend-Mitgliedergruppen aktiviert werden. Bei Uploads werden Mitglieder per E-Mail benachrichtigt und erhalten in der E-Mail einen Link zum Event im Frontend.
