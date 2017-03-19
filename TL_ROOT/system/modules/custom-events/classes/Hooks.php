@@ -29,7 +29,7 @@ class Hooks
         if ($_POST['FORM_SUBMIT'] && isset($_GET['auto_item']) && $_GET['events'] != '')
         {
 
-            if ($objWidget->type == 'fineUploader')
+            if ($objWidget->name == 'event_image_uploader')
             {
                 foreach ($objWidget->value as $source)
                 {

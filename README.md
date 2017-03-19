@@ -8,25 +8,46 @@ Wird eine Synchronisierung ausgelöst, werden zunächst alle Events des Kalenders 
 
 Der Update-Prozess kann zusätzlich mit dem CKalenderXMLEventImportBeforeUpdateHook-beeinflusst werden. Die Methode erwartet 4 Parameter ($arrSet, $child, $xml, $xmlString) und gibt als Rückgabewert $arrSet zurück.
 
+![Kalendereinstellungen](manual/images/tl_calendar.png?raw=true "Kalendereinstellungen")
+Kalendereinstellungen
 
 # custom-events
-Dieses Modul erweteitert das Contao Kalender Modul um weitere Funktionalitäten.
+Dieses Modul erweitert das Contao Kalender Modul um weitere Funktionalitäten. Es beinhaltet im Wesentlichen den Event-Fileupload, 3 Frontend Module und 2 Event-Templates (Event-Auflistung und Eventreader).
 
 ### Bildupload in der Detailansicht des Events.
 Angemeldete Benutzer können zum ausgewählten Event Bilder hochladen. Die Bilder werden nach dem Upload ins Verzeichnis files/events/event-id verschoben.
 Das Verzeichnis kann in der config.php des Moduls angepasst werden.
-Diese Bilder können dann mit dem dafür angefertigten Modul in der Detailansicht angezeigt werden. Bilder können direkt aus dem Frontend auch wieder gelöscht werden.
+Diese Bilder können dann mit dem dafür angefertigten Modul in der Detailansicht angezeigt werden. Bilder können direkt aus dem Frontend auch wieder gelöscht werden. Für den Upload muss im Formulargenerator ein Formular erstellt werden. Als Fileuploader wählt man den Fineuploader.
 
-Bei Uploads kann im Formular die E-Mail-Benachrichtigung für ausgewählte Frontend-Mitgliedergruppen aktiviert werden. BEi Uploads werden Mitglieder per E-Mail benachrichtigt und erhalten in der E-Mail einen Link zum Event im Frontend.
+![Upload-Formular](manual/images/upload_form.png?raw=true "Upload-Formular")
+Bei Uploads kann im Formular die E-Mail-Benachrichtigung für ausgewählte Frontend-Mitgliedergruppen aktiviert werden. Bei Uploads werden Mitglieder per E-Mail benachrichtigt und erhalten in der E-Mail einen Link zum Event im Frontend.
 
+![Bildupload Formularfeld](manual/images/fileupload_field.png?raw=true "Bildupload Formularfeld")
+Die Einstellungen für das Bildupload Formularfeld
 
-### Event-Rating-Modul
-Mit diesem Frontend-Modul können angemeldete Frontend-User einen Event anch dessen Ablauf bewerten (Star-Rating). Jeder User kann einen Event nur einmal bewerten. Der Durchschnitt wird dabei angezeigt.
+## Frontend Module
 
+### Event-Galerie
+Mit diesem Frontend-Modul lassen sich die zum Event hochgeladenen Bilder anzeigen.
 
-### Event-Auflistungs-Template
-Wir das im Modul genutzte Event-Auflistungs-Modul genutzt, werden die Events mit einem farbigen Punkt hervorgehoben.
+### Event-Rating-Formular
+Mit diesem Frontend-Modul können angemeldete Frontend-User einen Event nach dessen Ablauf bewerten (Star-Rating). Jeder User kann einen Event nur einmal bewerten. Der Durchschnitt wird dabei angezeigt.
+
+### Event-Rating
+Mit diesem Frontend-Modul lassen sich die Event-Ratings anzeigen (Durchschnittswert).
+
+## Eventlisting und Eventreader Templates
+
+### Eventlisting
+![Event Listing Template](manual/images/event_listing_template.png?raw=true "Event Listing Template")
+Wird das im Modul genutzte Event-Auflistungs-Modul genutzt, werden die Events mit einem farbigen Punkt hervorgehoben.
 
 - roter Punkt: Event noch nicht durchgeführt
 - gelber Punkt: Event mit Bilduploads
 - grüner Punkt: Event wurde bewertet.
+
+
+### Eventreader Template
+![Event Reader Template](manual/images/event_reader_template.png?raw=true "Event Reader Template")
+Das mitgelieferte Event-Reader Template ermöglicht die Darstellung von weiteren Feldern, welche aus Ckalender importiert wurden.
+
