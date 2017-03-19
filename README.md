@@ -20,13 +20,13 @@ Diese Bilder können dann mit dem dafür angefertigten Modul in der Detailansicht 
 Bei Uploads kann im Formular die E-Mail-Benachrichtigung für ausgewählte Frontend-Mitgliedergruppen aktiviert werden. BEi Uploads werden Mitglieder per E-Mail benachrichtigt und erhalten in der E-Mail einen Link zum Event im Frontend.
 
 
-### Event-Rating
-Nach Ablauf eines Events können angemeldete Frontend-User Events bewerten (Star-Rating). Jeder User kann nur einmal bewerten.
+### Event-Rating-Modul
+Mit diesem Frontend-Modul können angemeldete Frontend-User einen Event anch dessen Ablauf bewerten (Star-Rating). Jeder User kann einen Event nur einmal bewerten. Der Durchschnitt wird dabei angezeigt.
 
 
 ### Event-Auflistungs-Template
 Wir das im Modul genutzte Event-Auflistungs-Modul genutzt, werden die Events mit einem farbigen Punkt hervorgehoben.
 
-- roter Punkt: Event noch nciht durchgeführt
+- roter Punkt: Event noch nicht durchgeführt
 - gelber Punkt: Event mit Bilduploads
 - grüner Punkt: Event wurde bewertet.
