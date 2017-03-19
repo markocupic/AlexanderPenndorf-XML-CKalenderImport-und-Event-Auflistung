@@ -29,7 +29,7 @@ $GLOBALS['BE_MOD']['content']['calendar']['tables'][] = 'tl_calendar_events_rati
 
 /** Hooks **/
 // Move files to the event-directory
-$GLOBALS['TL_HOOKS']['validateFormField'][] = array('Markocupic\Customevents\Hooks', 'validateFormFieldHook');
+$GLOBALS['TL_HOOKS']['processFormData'][] = array('Markocupic\Customevents\Hooks', 'moveFilesToEventDirectory');
 // Notify members of selected groups on fileuploads
 $GLOBALS['TL_HOOKS']['processFormData'][] = array('Markocupic\Customevents\Hooks', 'notifyMembersOnFileupload');
 

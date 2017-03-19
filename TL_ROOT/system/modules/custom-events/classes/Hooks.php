@@ -18,80 +18,70 @@ class Hooks
     private static $strEventFolder = 'files/events';
 
     /**
+     * ProcessFormDataHook
      * @param Widget $objWidget
      * @param $intId
      * @param $arrForm
      * @return Widget
      */
-    public function validateFormFieldHook(\Widget $objWidget, $intId, $arrForm)
+    public function moveFilesToEventDirectory($arrSubmitted, $arrData, $arrFiles, $arrLabels, $objForm)
     {
 
         if ($_POST['FORM_SUBMIT'] && isset($_GET['auto_item']) && $_GET['events'] != '')
         {
-
-            if ($objWidget->type == 'fineUploader')
+            // Support for contao core fileupload, Dropzone and Fineuplaoder
+            if (isset($_SESSION['FORM_DATA']['event_image_uploader']) || isset($_SESSION['FORM_DATA']['event_image_uploader_fineuploader']))
             {
-                foreach ($objWidget->value as $source)
+                if (count($arrFiles) > 0)
                 {
-                    $objEvents = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
-                    if ($objEvents !== null)
+                    foreach ($arrFiles as $arrFile)
                     {
-
-                        // Create new event folder if it doesn't already exist
-                        $strFolder = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['EVENT_FOLDER'] . '/event-' . $objEvents->id . '/images';
-                        new \Folder($strFolder);
-
-                        // Get the file object
-                        if (\Validator::isUuid($source))
+                        $src = str_replace(TL_ROOT . '/', '', $arrFile['tmp_name']);
+                        $objEvents = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
+                        if ($objEvents !== null)
                         {
-                            $oFile = \FilesModel::findByUuid($source);
-                            if ($oFile === null)
+                            // Create new event folder if it doesn't already exist
+                            $strFolder = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['EVENT_FOLDER'] . '/event-' . $objEvents->id . '/images';
+                            new \Folder($strFolder);
+                            if (is_file(TL_ROOT . '/' . $src))
+                            {
+                                $objFile = new \File($src);
+                            }
+                            else
                             {
                                 continue;
                             }
-                            $objFile = new \File($oFile->path);
-                        }
-                        elseif (is_file(TL_ROOT . '/' . $source))
-                        {
-                            $objFile = new \File($source);
-                        }
-                        else
-                        {
-                            continue;
-                        }
 
-                        // Check for valide filetype
-                        if (!$objFile->isImage)
-                        {
-                            continue;
-                        }
-
-                        // Move file to the event folder
-                        $blnMoved = false;
-                        $i = 0;
-                        while ($blnMoved === false)
-                        {
-                            $i++;
-
-                            $filename = 'file-' . $i . '.' . strtolower($objFile->extension);
-                            if (!is_file(TL_ROOT . '/' . $strFolder . '/' . $filename))
+                            // Check for valide filetype
+                            if (!$objFile->isImage)
                             {
-                                \Files::getInstance()->copy($objFile->path, $strFolder . '/' . $filename);
-                                $blnMoved = true;
-                                $objOldFile = new \File($objFile->path, false);
-                                $objOldFile->delete();
+                                continue;
+                            }
+
+                            // Move file to the event folder
+                            $blnMoved = false;
+                            $i = 0;
+                            while ($blnMoved === false)
+                            {
+                                $i++;
+                                $filename = 'file-' . str_pad($i, 6, '0', STR_PAD_LEFT) . '.' . strtolower($objFile->extension);
+                                if (!is_file(TL_ROOT . '/' . $strFolder . '/' . $filename))
+                                {
+                                    \Files::getInstance()->copy($objFile->path, $strFolder . '/' . $filename);
+                                    $blnMoved = true;
+                                    $objOldFile = new \File($objFile->path, false);
+                                    $objOldFile->delete();
+                                }
                             }
                         }
                     }
                 }
             }
         }
-
-
-        return $objWidget;
     }
 
     /**
+     * ProcessFormDataHook
      * @param $arrSubmitted
      * @param $arrData
      * @param $arrFiles
