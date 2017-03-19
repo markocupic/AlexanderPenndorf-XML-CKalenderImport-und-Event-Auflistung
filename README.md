@@ -23,7 +23,7 @@ Diese Bilder können dann mit dem dafür angefertigten Modul in der Detailansicht 
 Bei Uploads kann im Formular die E-Mail-Benachrichtigung für ausgewählte Frontend-Mitgliedergruppen aktiviert werden. Bei Uploads werden Mitglieder per E-Mail benachrichtigt und erhalten in der E-Mail einen Link zum Event im Frontend.
 
 ![Bildupload Formularfeld](manual/images/fileupload_field.png?raw=true "Bildupload Formularfeld")
-Die Einstellungen für das Bildupload Formularfeld
+Wichtig!!! Die Einstellungen für das Bildupload Formularfeld. Der Feldname muss zwingend **"event_image_uploader"** heissen! Als Uploadverzeichnis kann irgend ein Ordner gewählt werden,. Der Ordner dient lediglich als temporärer Zwischenspeicher. Die Bilder werden nach dem Upload nach files/events/event-id verschoben.
 
 ## Frontend Module
 
