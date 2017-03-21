@@ -1,20 +1,26 @@
 <div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
-
 <?php if ($this->headline): ?>
 <<?= $this->hl ?>><?= $this->headline ?></<?= $this->hl ?>>
 <?php endif; ?>
-
-<ul class="row">
-<?php foreach($this->files as $file): ?>
-<li class="image-item col-12 col-sm-6 col-md-4 col-lg-3" data-file="<?= $file ?>">
-    <a href="<?= $file ?>" rel="colorbox" data-lightbox="lb2132312">
-        {{image::<?= $file ?>?width=400&height=400&mode=crop}}
-        <?php if(FE_USER_LOGGED_IN): ?><div><a href="" title="bild l&ouml;schen" class="delete-event-image">Bild l&ouml;schen</a></div><?php endif; ?>
-    </a>
-</li>
-<?php endforeach; ?>
-
-</ul>
+<?php $perRow = 3; ?>
+<?php $i=0; ?>
+<?php if($this->files): ?>
+<div class="ce_gallery block">
+    <ul class="cols_<?= $perRow ?>">
+    <?php foreach($this->files as $file): ?>
+    <li class="image_container <?=  Markocupic\Customevents\Helpers::getColClasses($i, $perRow) ?>" data-file="<?= $file['href'] ?>">
+        <a href="<?= $file['href'] ?>" rel="colorbox" data-lightbox="lb_eventgallery_<?= $this->id ?>" title="<?= $file['name'] ?>">
+            {{image::<?= $file['href'] ?>?width=400&height=400&mode=crop}}
+        </a>
+            <?php if(FE_USER_LOGGED_IN): ?>
+                <div><a href="" title="bild l&ouml;schen" class="delete-event-image">Bild l&ouml;schen</a></div>
+            <?php endif; ?>
+    </li>
+    <?php $i++; ?>
+    <?php endforeach; ?>
+    </ul>
+    </div>
+<?php endif; ?>
 </div>
 
 <script>
@@ -27,7 +33,7 @@
 
         var el = this;
         var data = {
-            'file': $(el).closest('.image-item').attr('data-file'),
+            'file': $(el).closest('*[data-file]').attr('data-file'),
             'delete_file': 'true'
         };
 
@@ -36,7 +42,7 @@
             data: data,
             success: function (data) {
                 if (data.status == 'success') {
-                    $(el).closest('.image-item').remove();
+                    $(el).closest('*[data-file]').remove();
                 }
             },
             dataType: "json"

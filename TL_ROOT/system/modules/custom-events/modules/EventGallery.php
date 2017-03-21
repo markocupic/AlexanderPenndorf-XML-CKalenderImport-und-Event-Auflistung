@@ -70,7 +70,8 @@ class EventGallery extends \Module
         $this->arrFiles = $this->getEventImagesFromUrl();
         if (count($this->arrFiles) < 1)
         {
-            return 'Noch keine Bilder';
+            // return 'Noch keine Bilder';
+            return '';
         }
 
         return parent::generate();
@@ -82,7 +83,17 @@ class EventGallery extends \Module
      */
     protected function compile()
     {
-        $this->Template->files = $this->arrFiles;
+        $arrFiles = array();
+        foreach($this->arrFiles as $file)
+        {
+            $arrFiles[] = array(
+                'href' => $file,
+                'name' => basename($file)
+            );
+        }
+        if(count($arrFiles)){
+            $this->Template->files = $arrFiles;
+        }
     }
 
     /**

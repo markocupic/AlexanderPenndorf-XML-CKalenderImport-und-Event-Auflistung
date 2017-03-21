@@ -5,9 +5,9 @@
 <?php endif; ?>
 
 <?php if($this->averageRating != ''): ?>
-<div class="average-rating">Durchschnittswertung: <?= $this->averageRating ?> Herzen aus <?= $this->countRatings ?> Bewertung(en)</div>
+<div class="average-rating">Durchschnittswertung: <?= $this->averageRating ?> Sterne aus <?= $this->countRatings ?> Bewertung(en)</div>
 <?php else: ?>
-<div class="no-average-rating">Für diesen Event zur Zeit noch keine Bewertungen vor.</div>
+<div class="no-average-rating">Für diesen Event liegen zur Zeit noch keine Bewertungen vor.</div>
 <?php endif; ?>
 
 <?php if(FE_USER_LOGGED_IN && $this->userRating): ?>
