@@ -83,16 +83,18 @@ class EventGallery extends \Module
      */
     protected function compile()
     {
-        $arrFiles = array();
-        foreach($this->arrFiles as $file)
+        $cols = array();
+        foreach($this->arrFiles as $i => $file)
         {
-            $arrFiles[] = array(
+            $cols[] = array(
                 'href' => $file,
-                'name' => basename($file)
+                'name' => basename($file),
+                'colClass' => $this->getColClass($i, $this->perRow)
             );
         }
-        if(count($arrFiles)){
-            $this->Template->files = $arrFiles;
+
+        if(count($cols)){
+            $this->Template->cols = $cols;
         }
     }
 
@@ -128,6 +130,42 @@ class EventGallery extends \Module
             }
         }
         return $arrFiles;
+    }
+
+    /**
+     * Helper Class
+     * @param $i
+     * @param $perRow
+     * @return string
+     */
+    protected function getColClass($i, $perRow=0)
+    {
+        $arrCSSClasses = array();
+
+        // Is col_first
+        if ($i % $perRow == 0)
+        {
+            $arrCSSClasses[] = 'col_first';
+        }
+        // Is col_last
+        if (($i + 1) % $perRow == 0)
+        {
+            $arrCSSClasses[] = 'col_last';
+        }
+
+        // Get col number
+        $arrCSSClasses[] = 'col_' . $i % $perRow;
+
+        // Get row number
+        $row = floor($i / $perRow);
+        $arrCSSClasses[] = 'row_' . $row;
+
+        // Add odd or even
+        $arrCSSClasses[] = $row % 2 == 0 ? 'even' : 'odd';
+
+
+        return implode(' ', $arrCSSClasses);
+
     }
 
 

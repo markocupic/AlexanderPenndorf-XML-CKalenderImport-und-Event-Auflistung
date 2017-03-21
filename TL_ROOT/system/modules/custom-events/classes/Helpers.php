@@ -97,39 +97,5 @@ class Helpers
         return $strHtml;
     }
 
-    /**
-     * Helper Class for template "mod_event_gallery"
-     * @param $i
-     * @param $perRow
-     * @return string
-     */
-    public static function getColClasses($i, $perRow)
-    {
-        $arrCSSClasses = array();
 
-        // Is col_first
-        if ($i % $perRow == 0)
-        {
-            $arrCSSClasses[] = 'col_first';
-        }
-        // Is col_last
-        if (($i + 1) % $perRow == 0)
-        {
-            $arrCSSClasses[] = 'col_last';
-        }
-
-        // Get col number
-        $arrCSSClasses[] = 'col_' . $i % $perRow;
-
-        // Get row number
-        $row = floor($i / $perRow);
-        $arrCSSClasses[] = 'row_' . $row;
-
-        // Add odd or even
-        $arrCSSClasses[] = $row % 2 == 0 ? 'even' : 'odd';
-
-
-        return implode(' ', $arrCSSClasses);
-
-    }
 }

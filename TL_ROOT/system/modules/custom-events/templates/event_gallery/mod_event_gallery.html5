@@ -1,53 +1,24 @@
+<?php $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/custom-events/assets/js/custom-events.js'; ?>
+
 <div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
 <?php if ($this->headline): ?>
 <<?= $this->hl ?>><?= $this->headline ?></<?= $this->hl ?>>
 <?php endif; ?>
-<?php $perRow = 3; ?>
-<?php $i=0; ?>
-<?php if($this->files): ?>
+
+<?php if($this->cols): ?>
 <div class="ce_gallery block">
-    <ul class="cols_<?= $perRow ?>">
-    <?php foreach($this->files as $file): ?>
-    <li class="image_container <?=  Markocupic\Customevents\Helpers::getColClasses($i, $perRow) ?>" data-file="<?= $file['href'] ?>">
-        <a href="<?= $file['href'] ?>" rel="colorbox" data-lightbox="lb_eventgallery_<?= $this->id ?>" title="<?= $file['name'] ?>">
-            {{image::<?= $file['href'] ?>?width=400&height=400&mode=crop}}
+    <ul class="cols_<?= $this->perRow ?>">
+    <?php foreach($this->cols as $col): ?>
+    <li class="image_container <?=  $col['colClass'] ?>" data-file="<?= $col['href'] ?>">
+        <a href="<?= $col['href'] ?>" rel="colorbox" data-lightbox="lb_eventgallery_<?= $this->id ?>" title="<?= $col['name'] ?>">
+            {{image::<?= $col['href'] ?>?width=400&height=400&mode=crop}}
         </a>
-            <?php if(FE_USER_LOGGED_IN): ?>
-                <div><a href="" title="bild l&ouml;schen" class="delete-event-image">Bild l&ouml;schen</a></div>
-            <?php endif; ?>
+        <?php if(FE_USER_LOGGED_IN): ?>
+            <div><a href="" title="bild l&ouml;schen" class="delete-event-image">Bild l&ouml;schen</a></div>
+        <?php endif; ?>
     </li>
-    <?php $i++; ?>
     <?php endforeach; ?>
     </ul>
     </div>
 <?php endif; ?>
 </div>
-
-<script>
-(function ($) {
-    $(document).ready(function() {
-        // Delete images
-        $('.delete-event-image').click(function (ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
-
-        var el = this;
-        var data = {
-            'file': $(el).closest('*[data-file]').attr('data-file'),
-            'delete_file': 'true'
-        };
-
-        $.ajax({
-            url: window.location.href,
-            data: data,
-            success: function (data) {
-                if (data.status == 'success') {
-                    $(el).closest('*[data-file]').remove();
-                }
-            },
-            dataType: "json"
-        });
-            });
-    });
-})(jQuery);
-</script>

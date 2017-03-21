@@ -11,13 +11,23 @@
 /**
  * Add a palette to tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['event_gallery'] = '{title_legend},name,headline,type;{template_legend:hide},eventGalleryTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['event_gallery'] = '{title_legend},name,headline,type;{image_legend},perRow;{template_legend:hide},eventGalleryTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['event_rating'] = '{title_legend},name,headline,type;{template_legend:hide},eventRatingTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['event_rating_form'] = '{title_legend},name,headline,type;{template_legend:hide},eventRatingFormTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 /**
  * Table tl_module
  */
+$GLOBALS['TL_DCA']['tl_module']['fields']['perRow'] = array
+(
+    'label'                   => &$GLOBALS['TL_LANG']['tl_module']['perRow'],
+    'default'                 => 4,
+    'exclude'                 => true,
+    'inputType'               => 'select',
+    'options'                 => array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+    'eval'                    => array('tl_class'=>'w50'),
+    'sql'                     => "smallint(5) unsigned NOT NULL default '0'"
+);
 $GLOBALS['TL_DCA']['tl_module']['fields']['eventGalleryTpl'] = array
 (
     'label'                   => &$GLOBALS['TL_LANG']['tl_module']['eventGalleryTpl'],
