@@ -84,16 +84,17 @@ class EventGallery extends \Module
     protected function compile()
     {
         $cols = array();
-        foreach($this->arrFiles as $i => $file)
+        foreach ($this->arrFiles as $i => $file)
         {
             $cols[] = array(
-                'href' => $file,
-                'name' => basename($file),
-                'colClass' => $this->getColClass($i, $this->perRow)
+                'href'     => $file,
+                'name'     => basename($file),
+                'colClass' => $this->getColClass($i, $this->perRow, $this->arrFiles),
             );
         }
 
-        if(count($cols)){
+        if (count($cols))
+        {
             $this->Template->cols = $cols;
         }
     }
@@ -138,8 +139,13 @@ class EventGallery extends \Module
      * @param $perRow
      * @return string
      */
-    protected function getColClass($i, $perRow=0)
+    protected function getColClass($i, $perRow = 0, $files)
     {
+        if ($perRow < 1)
+        {
+            $perRow = count($files);
+        }
+
         $arrCSSClasses = array();
 
         // Is col_first
