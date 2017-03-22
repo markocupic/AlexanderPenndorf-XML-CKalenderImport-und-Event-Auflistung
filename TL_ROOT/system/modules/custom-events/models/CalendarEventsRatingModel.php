@@ -29,12 +29,12 @@ class CalendarEventsRatingModel extends \Model
      * @param $eventId
      * @return mixed|null
      */
-    public static function getUserRating($userId, $eventId)
+    public static function getUserRating($fieldname, $userId, $eventId)
     {
         $objRating = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_rating WHERE memberId=? AND pid=? LIMIT 0,1')->execute($userId, $eventId);
         if ($objRating->numRows)
         {
-            return $objRating->rating;
+            return $objRating->{$fieldname};
         }
         return null;
     }
@@ -44,9 +44,9 @@ class CalendarEventsRatingModel extends \Model
      * @param int $precision
      * @return float
      */
-    public static function getAverageRating($eventId, $precision = 2)
+    public static function getAverageRating($fieldname, $eventId, $precision = 2)
     {
-        $objRating = \Database::getInstance()->prepare('SELECT AVG(rating) AS averageRating FROM tl_calendar_events_rating WHERE tl_calendar_events_rating.pid=? AND tl_calendar_events_rating.memberId IN (SELECT id FROM tl_member)')->execute($eventId);
+        $objRating = \Database::getInstance()->prepare('SELECT AVG(' . $fieldname . ') AS averageRating FROM tl_calendar_events_rating WHERE tl_calendar_events_rating.pid=? AND tl_calendar_events_rating.memberId IN (SELECT id FROM tl_member)')->execute($eventId);
         return round($objRating->averageRating, $precision);
     }
 
@@ -59,4 +59,5 @@ class CalendarEventsRatingModel extends \Model
         $objRating = \Database::getInstance()->prepare('SELECT id FROM tl_calendar_events_rating WHERE tl_calendar_events_rating.pid=? AND tl_calendar_events_rating.memberId IN (SELECT id FROM tl_member)')->execute($eventId);
         return $objRating->numRows;
     }
+
 }

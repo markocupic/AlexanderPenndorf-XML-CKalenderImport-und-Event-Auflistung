@@ -15,7 +15,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['config']['ondelete_callback'][] = arra
 $GLOBALS['TL_DCA']['tl_calendar_events']['list']['operations']['ratings'] = array(
     'label' => &$GLOBALS['TL_LANG']['tl_calendar_events']['ratings'],
     'href'  => 'table=tl_calendar_events_rating',
-    'icon'  => 'edit.gif',
+    'icon'  => 'system/modules/custom-events/assets/images/star.png',
 );
 
 

@@ -35,6 +35,12 @@ class EventRatingForm extends \Module
 
 
     /**
+     * @var bool
+     */
+    protected $blnError = false;
+
+
+    /**
      * @return string
      */
     public function generate()
@@ -59,25 +65,54 @@ class EventRatingForm extends \Module
         }
 
         // Insert Rating
-        if (FE_USER_LOGGED_IN && $_POST['FORM_SUBMIT'] == 'formEventRating' && is_numeric($_POST['rating']) && $_POST['rating'] > 0 && $_POST['rating'] < 6 && isset($_GET['auto_item']) && $_GET['events'] != '')
+        if (FE_USER_LOGGED_IN && $_POST['FORM_SUBMIT'] == 'formEventRating' && isset($_GET['auto_item']) && $_GET['events'] != '')
         {
-            $objEvents = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
-            if ($objEvents !== null)
+
+            $set = array();
+            $arrFormInputStarRatings = array('ratingTechnikImShop', 'ratingAufbauAbbauVorOrt', 'ratingKundenfrequenzImShop', 'ratingZustandShop', 'ratingUnterstuetzungImShop', 'ratingWetter');
+            $arrFormInputNumerics = array('anzahlDurchgefuehrteBeratungen', 'anzahlAbgeschlosseneVertraege', 'festnetz', 'kreditMobile', 'kommentarZumEinsatz');
+            $arrFormInputText = array('kommentarZumEinsatz');
+            foreach($arrFormInputStarRatings as $fieldname)
             {
-                $objUser = \FrontendUser::getInstance();
-                $objRating = $this->Database->prepare('SELECT * FROM tl_calendar_events_rating WHERE memberId=? AND pid=?')->execute($objUser->id, $objEvents->id);
-                if (!$objRating->numRows)
+                if(!is_numeric(\Input::post($fieldname)) || \Input::post($fieldname) < 1 || \Input::post($fieldname) > 6)
                 {
-                    $set = array(
-                        'memberId' => $objUser->id,
-                        'pid'      => $objEvents->id,
-                        'tstamp'   => time(),
-                        'rating'   => (int)$_POST['rating'],
-                    );
-                    $this->Database->prepare('INSERT INTO tl_calendar_events_rating %s')->set($set)->execute();
-                    $this->reload();
+                    $this->blnError = true;
+                }else{
+                    $set[$fieldname] = (int) \Input::post($fieldname);
                 }
             }
+
+            foreach($arrFormInputNumerics as $fieldname)
+            {
+                if(!is_numeric(\Input::post($fieldname)) && (int) \Input::post($fieldname) != 0)
+                {
+                    $this->blnError = true;
+                }
+                else{
+                    $set[$fieldname] = (int) \Input::post($fieldname);
+                }
+            }
+
+            $set['kommentarZumEinsatz'] = \Input::post('kommentarZumEinsatz');
+
+            if($this->blnError !== true)
+            {
+                $objEvents = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
+                if ($objEvents !== null)
+                {
+                    $objUser = \FrontendUser::getInstance();
+                    $objRating = $this->Database->prepare('SELECT * FROM tl_calendar_events_rating WHERE memberId=? AND pid=?')->execute($objUser->id, $objEvents->id);
+                    if (!$objRating->numRows)
+                    {
+                        $set['memberId'] = $objUser->id;
+                        $set['pid'] = $objEvents->id;
+                        $set['tstamp'] = time();
+                        $this->Database->prepare('INSERT INTO tl_calendar_events_rating %s')->set($set)->execute();
+                        $this->reload();
+                    }
+                }
+            }
+
         }
 
         // Show Form to Logged in users only!
@@ -119,27 +154,75 @@ class EventRatingForm extends \Module
      */
     protected function compile()
     {
-        $this->Template->userRating = $this->getUserRating();
+        $arrFormInputStarRatings = array('ratingTechnikImShop', 'ratingAufbauAbbauVorOrt', 'ratingKundenfrequenzImShop', 'ratingZustandShop', 'ratingUnterstuetzungImShop', 'ratingWetter');
+        $arrFormInputNumerics = array('anzahlDurchgefuehrteBeratungen', 'anzahlAbgeschlosseneVertraege', 'festnetz', 'kreditMobile', 'kommentarZumEinsatz');
+        //$arrFormInputText = array('kommentarZumEinsatz');
+
+        $averageRatings = array();
+        $userRatings = array();
+        foreach($arrFormInputStarRatings as $fieldname)
+        {
+            $averageRatings[$fieldname] = $this->getAverageRating($fieldname, 2);
+            $userRatings[$fieldname] = $this->getUserRating($fieldname);
+        }
+        $this->Template->averageRatings = $averageRatings;
+        $this->Template->userRatings = $userRatings;
+
+
+        $numerics = array();
+        foreach($arrFormInputNumerics as $fieldname)
+        {
+            //$numerics[$fieldname] = $this->getAverageRating($fieldname, 2);
+        }
+        $this->Template->numerics = $numerics;
+
+        // Comments
+        $comments = array();
+        $objRatings = \CalendarEventsRatingModel::findByPid($this->objEvent->id);
+        if($objRatings !== null)
+        {
+            while($objRatings->next())
+            {
+                if($objRatings->kommentarZumEinsatz != '')
+                {
+                    $comments[] = nl2br($objRatings->kommentarZumEinsatz);
+                }
+            }
+        }
+        $this->Template->comments = $comments;
+
+        $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_rating WHERE memberId=? AND pid=?')->execute($this->objUser->id, $this->objEvent->id);
+        if($objEvents->numRows)
+        {
+            $this->Template->loggedInUserHasRated = true;
+        }
+
+
         $this->Template->objEvent = $this->objEvent;
         $this->Template->objUser = $this->objUser;
-        $this->Template->averageRating = $this->getAverageRating(2);
         $this->Template->countRatings = $this->countRatings();
+
+
+        \Controller::loadLanguageFile('tl_calendar_events_rating');
+        $this->Template->labels = $GLOBALS['TL_LANG']['tl_calendar_events_rating'];
+
     }
+
 
     /**
      * @return mixed
      */
-    protected function getUserRating()
+    protected function getUserRating($fieldname)
     {
-        return \CalendarEventsRatingModel::getUserRating($this->objUser->id, $this->objEvent->id);
+        return \CalendarEventsRatingModel::getUserRating($fieldname, $this->objUser->id, $this->objEvent->id);
     }
 
     /**
      * @return mixed|null
      */
-    protected function getAverageRating($precision = 2)
+    protected function getAverageRating($fieldname, $precision = 2)
     {
-        return \CalendarEventsRatingModel::getAverageRating($this->objEvent->id, $precision = 2);
+        return \CalendarEventsRatingModel::getAverageRating($fieldname, $this->objEvent->id, $precision = 2);
     }
 
     /**
