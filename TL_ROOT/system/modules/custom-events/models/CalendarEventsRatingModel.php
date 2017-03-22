@@ -60,4 +60,15 @@ class CalendarEventsRatingModel extends \Model
         return $objRating->numRows;
     }
 
+    /**
+     * @param $eventId
+     * @param $userId
+     * @return int
+     */
+    public static function countRatingsFromUser($eventId, $userId)
+    {
+        $objRating = \Database::getInstance()->prepare('SELECT id FROM tl_calendar_events_rating WHERE tl_calendar_events_rating.pid=? AND tl_calendar_events_rating.memberId=? AND tl_calendar_events_rating.memberId IN (SELECT id FROM tl_member)')->execute($eventId, $userId);
+        return $objRating->numRows;
+    }
+
 }

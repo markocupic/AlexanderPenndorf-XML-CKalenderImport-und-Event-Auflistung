@@ -139,7 +139,7 @@ class EventRatingForm extends \Module
             return '';
         }
 
-        if (\CalendarEventsRatingModel::countRatings($this->objEvent->id) > 0)
+        if (\CalendarEventsRatingModel::countRatingsFromUser($this->objEvent->id, $this->objUser->id) > 0)
         {
             return '';
         }
