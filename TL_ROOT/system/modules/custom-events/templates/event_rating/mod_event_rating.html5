@@ -5,23 +5,29 @@
 <?php endif; ?>
 
 <?php if($this->countRatings > 0): ?>
-<?php //die(print_r($this->averageRatings,true)); ?>
-<?php foreach($this->averageRatings as $fieldname => $averageRating): ?>
-<div class="average-rating">Durchschnittswertung für <?= $this->labels[$fieldname][0] ?>: <?= $averageRating ?> Sterne aus <?= $this->countRatings ?> Bewertung(en)</div>
-<?php endforeach; ?>
+    <h2>Star-rating</h2>
+    <?php foreach($this->starRatings as $fieldname => $averageRating): ?>
+    <div class="rating-numeric">Durchschnittswertung für <strong><?= $this->labels[$fieldname][0] ?></strong>: <?= $averageRating ?> Sterne</div>
+    <div class="rating-star"><?= Markocupic\Customevents\Helpers::generateRatingIconHtml('<span class="ratingstarfull"></span>', $averageRating) ?></div>
+    {{br}}
+    <?php endforeach; ?>
 
-<h2>Bemerkungen/Kommentare</h2>
-<?php foreach($this->comments as $comment): ?>
-<div class="rating-comment"><?= $comment ?></div>
-<?php endforeach; ?>
+{{br}}{{br}}
 
-<?php else: ?>
-<div class="no-average-rating">Für diesen Event liegen zur Zeit noch keine Bewertungen vor.</div>
+    <h2>Weitere Zahlen</h2>
+    <?php foreach($this->numericValues as $fieldname => $averageRating): ?>
+    <div class="numeric-values"><strong><?= $this->labels[$fieldname][0] ?></strong>: <?= $averageRating ?></div>
+    <?php endforeach; ?>
+
+{{br}}{{br}}
+
+    <h2>Bemerkungen/Kommentare</h2>
+    <?php foreach($this->comments as $comment): ?>
+    <div class="rating-comment"><?= $comment ?></div>
+    <?php endforeach; ?>
+
+    <?php else: ?>
+    <div class="no-average-rating">Für diesen Event liegen zur Zeit noch keine Bewertungen vor.</div>
 <?php endif; ?>
 
-<?php if(FE_USER_LOGGED_IN && $this->loggedInUserHasRated): ?>
-<?php foreach($this->userRatings as $fieldname => $userRating): ?>
-<div class="user-rating">Ihre Wertung für <?= $this->labels[$fieldname][0] ?>: <?= Markocupic\Customevents\Helpers::generateRatingIconHtml('<span class="user-ratingstar"> </span>', $userRating) ?></div>
-<?php endforeach; ?>
-<?php endif; ?>
 </div>

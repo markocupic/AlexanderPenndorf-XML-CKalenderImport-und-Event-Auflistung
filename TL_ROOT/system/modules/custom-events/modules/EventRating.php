@@ -65,7 +65,7 @@ class EventRating extends \Module
         // Show to logged in users only!
         if (!FE_USER_LOGGED_IN)
         {
-            return '';
+            //return '';
         }
 
         $this->objUser = \FrontendUser::getInstance();
@@ -96,55 +96,61 @@ class EventRating extends \Module
      */
     protected function compile()
     {
-        $arrFormInputStarRatings = array('ratingTechnikImShop', 'ratingAufbauAbbauVorOrt', 'ratingKundenfrequenzImShop', 'ratingZustandShop', 'ratingUnterstuetzungImShop', 'ratingWetter');
-        $arrFormInputNumerics = array('anzahlDurchgefuehrteBeratungen', 'anzahlAbgeschlosseneVertraege', 'festnetz', 'kreditMobile', 'kommentarZumEinsatz');
-        //$arrFormInputText = array('kommentarZumEinsatz');
 
+        $this->Template->countRatings = $this->countRatings();
+
+        // Star-Rating Values
+        $arrFormInputStarRatings = array('ratingTechnikImShop', 'ratingAufbauAbbauVorOrt', 'ratingKundenfrequenzImShop', 'ratingZustandShop', 'ratingUnterstuetzungImShop', 'ratingWetter');
         $averageRatings = array();
         $userRatings = array();
         foreach($arrFormInputStarRatings as $fieldname)
         {
             $averageRatings[$fieldname] = $this->getAverageRating($fieldname, 2);
-            $userRatings[$fieldname] = $this->getUserRating($fieldname);
+            if(FE_USER_LOGGED_IN)
+            {
+                $userRatings[$fieldname] = $this->getUserRating($fieldname);
+            }
         }
-        $this->Template->averageRatings = $averageRatings;
-        $this->Template->userRatings = $userRatings;
+        $this->Template->starRatings = $averageRatings;
 
-
-        $numerics = array();
+        // Other numeric values
+        $arrFormInputNumerics = array('anzahlDurchgefuehrteBeratungen', 'anzahlAbgeschlosseneVertraege', 'festnetz', 'kreditMobile');
+        $numericValues = array();
         foreach($arrFormInputNumerics as $fieldname)
         {
-            //$numerics[$fieldname] = $this->getAverageRating($fieldname, 2);
+            $numericValues[$fieldname] = $this->getAverageRating($fieldname, 2);
         }
-        $this->Template->numerics = $numerics;
+        $this->Template->numericValues = $numericValues;
+
+
 
         // Comments
         $comments = array();
+        $fieldname = 'kommentarZumEinsatz';
         $objRatings = \CalendarEventsRatingModel::findByPid($this->objEvent->id);
         if($objRatings !== null)
         {
             while($objRatings->next())
             {
-                if($objRatings->kommentarZumEinsatz != '')
+                if($objRatings->{$fieldname} != '')
                 {
-                    $comments[] = nl2br($objRatings->kommentarZumEinsatz);
+                    $comments[] = nl2br($objRatings->{$fieldname});
                 }
             }
         }
         $this->Template->comments = $comments;
 
-        $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_rating WHERE memberId=? AND pid=?')->execute($this->objUser->id, $this->objEvent->id);
-        if($objEvents->numRows)
-        {
-            $this->Template->loggedInUserHasRated = true;
+
+
+        // Logged in user
+        $this->Template->objEvent = $this->objEvent;
+        if(FE_USER_LOGGED_IN) {
+            $this->Template->objUser = $this->objUser;
         }
 
 
-        $this->Template->objEvent = $this->objEvent;
-        $this->Template->objUser = $this->objUser;
-        $this->Template->countRatings = $this->countRatings();
 
-
+        // Labels
         \Controller::loadLanguageFile('tl_calendar_events_rating');
         $this->Template->labels = $GLOBALS['TL_LANG']['tl_calendar_events_rating'];
 

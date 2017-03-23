@@ -81,11 +81,19 @@
 <script>
 $( document ).ready(function() {
     var formId = '#starRatingForm-<?= $this->id ?>';
-    $(formId + ' .starrr').on('starrr:change', function(e, value){
-        var fieldName = $(this).attr('data-field');
-        $(formId + ' input#' + fieldName).prop('value', value);
-    });
+    $(formId + ' .starrr').starrr({
+        max: 6,
+        readOnly: false,
+        emptyClass: 'ratingstar',
+        fullClass: 'ratingstarfull',
+        change: function(e, value){
+            var fieldName = $(this).attr('data-field');
+            $(formId + ' input#' + fieldName).prop('value', value);
+        }
+    })
 
+
+    // Onsubmit event (validate inputs)
     $( formId ).submit(function( event ) {
         // Validate star-rating
         var blnError = false;
@@ -100,9 +108,9 @@ $( document ).ready(function() {
             event.preventDefault();
         }
     });
+
+
 });
-
-
 
 
 </script>

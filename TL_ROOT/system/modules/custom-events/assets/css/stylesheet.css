@@ -1,5 +1,13 @@
 .ratingstar,.ratingstarfull{
     cursor:pointer;
+    text-decoration:none;
+}
+.ratingstar:hover,.ratingstarfull:hover,.ratingstar:active,.ratingstarfull:active,.ratingstar:visited,.ratingstarfull:visited,.ratingstar:focus,.ratingstarfull:focus {
+    text-decoration:none !important;
+}
+.ratingstar,.ratingstarfull{
+    cursor:pointer;
+    color: red !important;
 }
 .ratingstarfull:before{
     content: "\2605";
@@ -13,7 +21,7 @@
 .user-ratingstar:before{
     content: "\2606";
     font-size:40px;
-    color: yellow;
+    color: yellow !important;
     position:relative;
     top:6px;
 }

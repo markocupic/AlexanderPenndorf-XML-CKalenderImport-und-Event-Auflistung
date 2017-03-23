@@ -123,6 +123,7 @@ class EventRatingForm extends \Module
 
         $this->objUser = \FrontendUser::getInstance();
 
+        // Dont make form available until event has stopped
         $objEvent = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
         if ($objEvent !== null)
         {
@@ -139,7 +140,8 @@ class EventRatingForm extends \Module
             return '';
         }
 
-        if (\CalendarEventsRatingModel::countRatingsFromUser($this->objEvent->id, $this->objUser->id) > 0)
+        // Allow only 1 rating per event
+        if (\CalendarEventsRatingModel::countRatings($this->objEvent->id) > 0)
         {
             return '';
         }
@@ -154,82 +156,7 @@ class EventRatingForm extends \Module
      */
     protected function compile()
     {
-        $arrFormInputStarRatings = array('ratingTechnikImShop', 'ratingAufbauAbbauVorOrt', 'ratingKundenfrequenzImShop', 'ratingZustandShop', 'ratingUnterstuetzungImShop', 'ratingWetter');
-        $arrFormInputNumerics = array('anzahlDurchgefuehrteBeratungen', 'anzahlAbgeschlosseneVertraege', 'festnetz', 'kreditMobile', 'kommentarZumEinsatz');
-        //$arrFormInputText = array('kommentarZumEinsatz');
-
-        $averageRatings = array();
-        $userRatings = array();
-        foreach($arrFormInputStarRatings as $fieldname)
-        {
-            $averageRatings[$fieldname] = $this->getAverageRating($fieldname, 2);
-            $userRatings[$fieldname] = $this->getUserRating($fieldname);
-        }
-        $this->Template->averageRatings = $averageRatings;
-        $this->Template->userRatings = $userRatings;
-
-
-        $numerics = array();
-        foreach($arrFormInputNumerics as $fieldname)
-        {
-            //$numerics[$fieldname] = $this->getAverageRating($fieldname, 2);
-        }
-        $this->Template->numerics = $numerics;
-
-        // Comments
-        $comments = array();
-        $objRatings = \CalendarEventsRatingModel::findByPid($this->objEvent->id);
-        if($objRatings !== null)
-        {
-            while($objRatings->next())
-            {
-                if($objRatings->kommentarZumEinsatz != '')
-                {
-                    $comments[] = nl2br($objRatings->kommentarZumEinsatz);
-                }
-            }
-        }
-        $this->Template->comments = $comments;
-
-        $objEvents = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events_rating WHERE memberId=? AND pid=?')->execute($this->objUser->id, $this->objEvent->id);
-        if($objEvents->numRows)
-        {
-            $this->Template->loggedInUserHasRated = true;
-        }
-
-
-        $this->Template->objEvent = $this->objEvent;
-        $this->Template->objUser = $this->objUser;
-        $this->Template->countRatings = $this->countRatings();
-
-
-        \Controller::loadLanguageFile('tl_calendar_events_rating');
-        $this->Template->labels = $GLOBALS['TL_LANG']['tl_calendar_events_rating'];
 
     }
 
-
-    /**
-     * @return mixed
-     */
-    protected function getUserRating($fieldname)
-    {
-        return \CalendarEventsRatingModel::getUserRating($fieldname, $this->objUser->id, $this->objEvent->id);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    protected function getAverageRating($fieldname, $precision = 2)
-    {
-        return \CalendarEventsRatingModel::getAverageRating($fieldname, $this->objEvent->id, $precision = 2);
-    }
-
-    /**
-     * @return int
-     */
-    protected function countRatings()
-    {
-        return \CalendarEventsRatingModel::countRatings($this->objEvent->id);
-    }
 }

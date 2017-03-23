@@ -33,7 +33,7 @@ $GLOBALS['TL_DCA']['tl_calendar_events_rating'] = array(
             'flag'   => 1,
         ),
         'label'             => array(
-            'fields' => array(''),
+            'fields' => array('kommentarZumEinsatz'),
             'format' => '%s',
         ),
         'global_operations' => array(

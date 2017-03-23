@@ -49,7 +49,6 @@ class Helpers
         return implode(' ', $arrCssClasses);
     }
 
-
     /**
      * @param $eventId
      * @return int
