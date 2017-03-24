@@ -284,6 +284,9 @@ class CKalenderXmlEventImport extends \System
      */
     public static function generateUuid()
     {
+        if(\Input::get('table') != 'tl_calendar_events'){
+            return null;
+        }
 
         $objDb = \Database::getInstance();
         if (!$objDb->fieldExists('uuid', 'tl_calendar_events'))

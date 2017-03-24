@@ -11,22 +11,8 @@
 $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default'] = str_replace('teaser;', 'teaser;{ckal_fields},uuid,notiz,verantwortlich,benutzergruppe,text;', $GLOBALS['TL_DCA']['tl_calendar_events']['palettes']['default']);
 
 
-// First fill tl_calendar_events.uuid with unique values, then add the unique key
-if (Database::getInstance()->fieldExists('uuid', 'tl_calendar_events'))
-{
-    $objDb = Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE uuid<?')->execute(1);
-    while ($objDb->next())
-    {
-        $uuid = Markocupic\CKalenderXmlEventImport::generateUuid();
-        Database::getInstance()->prepare('UPDATE tl_calendar_events SET uuid=? WHERE id=?')->execute($uuid, $objDb->id);
-    }
-
-    // Keys
-    $GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['uuid'] = 'unique';
-}
-
-
-
+// Keys
+$GLOBALS['TL_DCA']['tl_calendar_events']['config']['sql']['keys']['uuid'] = 'unique';
 
 // Fields
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['uuid'] = array(
@@ -35,8 +21,8 @@ $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['uuid'] = array(
     'exclude'   => true,
     'default'   => Markocupic\CKalenderXmlEventImport::generateUuid(),
     'inputType' => 'text',
-    'eval'      => array('mandatory' => true, 'readonly' => true, 'doNotCopy' => true, 'rgxp' => 'digit'),
-    'sql'       => "int(10) unsigned NOT NULL default '0'",
+    'eval'      => array('mandatory' => true, 'readonly' => true, 'doNotShow' => true, 'doNotCopy' => true, 'rgxp' => 'digit'),
+    'sql'       => "varchar(128) NOT NULL default ''",
 );
 
 $GLOBALS['TL_DCA']['tl_calendar_events']['fields']['notiz'] = array(
