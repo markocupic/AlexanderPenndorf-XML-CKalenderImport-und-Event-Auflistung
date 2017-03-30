@@ -38,5 +38,6 @@ $GLOBALS['TL_HOOKS']['processFormData'][] = array('Markocupic\Customevents\Hooks
 if (TL_MODE == 'FE')
 {
     $GLOBALS['TL_CSS'][] = 'system/modules/custom-events/assets/css/stylesheet.css';
+    $GLOBALS['TL_CSS'][] = 'system/modules/custom-events/assets/fonts/star-rating/css/star-rating.css';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/custom-events/assets/js/custom-events.js';
 }

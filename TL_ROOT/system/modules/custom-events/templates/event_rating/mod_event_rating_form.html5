@@ -84,8 +84,8 @@ $( document ).ready(function() {
     $(formId + ' .starrr').starrr({
         max: 6,
         readOnly: false,
-        emptyClass: 'ratingstar',
-        fullClass: 'ratingstarfull',
+        emptyClass: 'sr-star-empty',
+        fullClass: 'sr-star',
         change: function(e, value){
             var fieldName = $(this).attr('data-field');
             $(formId + ' input#' + fieldName).prop('value', value);

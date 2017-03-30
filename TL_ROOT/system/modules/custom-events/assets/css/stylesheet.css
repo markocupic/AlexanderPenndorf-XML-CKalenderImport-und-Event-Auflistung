@@ -1,29 +1,17 @@
-.ratingstar,.ratingstarfull{
-    cursor:pointer;
-    text-decoration:none;
-}
-.ratingstar:hover,.ratingstarfull:hover,.ratingstar:active,.ratingstarfull:active,.ratingstar:visited,.ratingstarfull:visited,.ratingstar:focus,.ratingstarfull:focus {
+a.sr-star-empty:hover,a.sr-star:hover,a.sr-star-empty:active,a.sr-star:active,a.sr-star-empty:visited,a.sr-star:visited,a.sr-star-empty:focus,a.sr-star:focus {
     text-decoration:none !important;
 }
-.ratingstar,.ratingstarfull{
+a.sr-star-empty,a.sr-star{
+    font-size:1.5rem !important;
     cursor:pointer;
     color: red !important;
-}
-.ratingstarfull:before{
-    content: "\2605";
-    font-size:40px;
-}
-.ratingstar:before{
-    content: "\2606";
-    font-size:40px;
+    text-decoration:none;
 }
 
-.user-ratingstar:before{
-    content: "\2606";
-    font-size:40px;
-    color: yellow !important;
-    position:relative;
-    top:6px;
+
+.mod_event_rating .sr-star{
+    color: #000;
+    font-size:1.5rem !important;
 }
 
 

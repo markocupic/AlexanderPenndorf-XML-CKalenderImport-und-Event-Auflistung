@@ -1,0 +1,5 @@
+
+.sr-star:before { content: '\e800'; } /* '' */
+.sr-star-empty:before { content: '\e801'; } /* '' */
+.sr-star-half:before { content: '\e802'; } /* '' */
+.sr-star-half-alt:before { content: '\f123'; } /* '' */

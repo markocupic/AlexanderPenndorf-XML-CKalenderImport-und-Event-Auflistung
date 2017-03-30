@@ -8,24 +8,25 @@
     <h2>Star-rating</h2>
     <?php foreach($this->starRatings as $fieldname => $averageRating): ?>
     <div class="rating-numeric">Durchschnittswertung für <strong><?= $this->labels[$fieldname][0] ?></strong>: <?= $averageRating ?> Sterne</div>
-    <div class="rating-star"><?= Markocupic\Customevents\Helpers::generateRatingIconHtml('<span class="ratingstarfull"></span>', $averageRating) ?></div>
+    <div class="rating-star"><?= Markocupic\Customevents\Helpers::generateRatingIconHtml('<i class="sr-star"></i>', $averageRating) ?></div>
     {{br}}
     <?php endforeach; ?>
 
-{{br}}{{br}}
+    {{br}}
 
     <h2>Weitere Zahlen</h2>
     <?php foreach($this->numericValues as $fieldname => $averageRating): ?>
     <div class="numeric-values"><strong><?= $this->labels[$fieldname][0] ?></strong>: <?= $averageRating ?></div>
     <?php endforeach; ?>
 
-{{br}}{{br}}
 
-    <h2>Bemerkungen/Kommentare</h2>
-    <?php foreach($this->comments as $comment): ?>
-    <div class="rating-comment"><?= $comment ?></div>
-    <?php endforeach; ?>
-
+    <?php if($this->comments): ?>
+        {{br}}
+        <h2>Bemerkungen/Kommentare</h2>
+        <?php foreach($this->comments as $comment): ?>
+        <div class="rating-comment"><?= $comment ?></div>
+        <?php endforeach; ?>
+    <?php endif; ?>
     <?php else: ?>
     <div class="no-average-rating">Für diesen Event liegen zur Zeit noch keine Bewertungen vor.</div>
 <?php endif; ?>

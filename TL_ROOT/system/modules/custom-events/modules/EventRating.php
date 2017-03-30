@@ -137,8 +137,12 @@ class EventRating extends \Module
                     $comments[] = nl2br($objRatings->{$fieldname});
                 }
             }
+
         }
-        $this->Template->comments = $comments;
+        if(count($comments) > 0)
+        {
+            $this->Template->comments = $comments;
+        }
 
 
 
