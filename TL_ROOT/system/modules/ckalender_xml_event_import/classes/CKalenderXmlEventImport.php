@@ -39,7 +39,7 @@ class CKalenderXmlEventImport extends \System
      */
     public function backendTrigger(\DataContainer $dc)
     {
-        if(TL_MODE == 'BE' && \Input::post('FORM_SUBMIT') == 'tl_calendar')
+        if (TL_MODE == 'BE' && \Input::post('FORM_SUBMIT') == 'tl_calendar')
         {
             $objCalendar = \Database::getInstance()->prepare('SELECT * FROM tl_calendar WHERE id=?')->execute($dc->id);
             if ($objCalendar->numRows)
@@ -131,7 +131,8 @@ class CKalenderXmlEventImport extends \System
         }
 
         // Hide all Events of the selected calendar
-        \Database::getInstance()->prepare('UPDATE tl_calendar_events SET published=? WHERE pid=?')->execute('', $this->calendarId);
+        \Database::getInstance()->prepare('UPDATE tl_calendar_events SET published=? WHERE pid=?')->execute('',
+            $this->calendarId);
 
         $items = 0;
         foreach ($xml->children() as $child)
@@ -152,22 +153,27 @@ class CKalenderXmlEventImport extends \System
             if (isset($arrSet) && is_array($arrSet) && $arrSet['uuid'] > 0)
             {
                 $items++;
-                $arrSet['pid'] = $this->calendarId;
                 $arrSet['published'] = '1';
-                $objEvent = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE uuid=? LIMIT 0,1')->execute($arrSet['uuid']);
+                $objEvent = \Database::getInstance()->prepare('SELECT * FROM tl_calendar_events WHERE uuid=? && pid=?')->execute($arrSet['uuid'],
+                    $this->calendarId);
                 if ($objEvent->numRows)
                 {
-                    \Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objEvent->id);
+                    while ($objEvent->next())
+                    {
+                        \Database::getInstance()->prepare('UPDATE tl_calendar_events %s WHERE id=?')->set($arrSet)->execute($objEvent->id);
+                    }
                 }
                 else
                 {
+                    $arrSet['pid'] = $this->calendarId;
                     \Database::getInstance()->prepare('INSERT INTO tl_calendar_events %s')->set($arrSet)->execute();
                 }
             }
         }
         if ($items > 0)
         {
-            $this->log('Reloaded ' . $items . ' Events from ckalender to tl_calendar with ID: ' . $this->calendarId, __METHOD__, TL_GENERAL);
+            $this->log('Reloaded ' . $items . ' Events from ckalender to tl_calendar with ID: ' . $this->calendarId,
+                __METHOD__, TL_GENERAL);
             if (TL_MODE == 'FE')
             {
                 \Controller::reload();
@@ -175,7 +181,8 @@ class CKalenderXmlEventImport extends \System
         }
         else
         {
-            $this->log('Reloaded ' . $items . ' Events from ckalender to tl_calendar with ID: ' . $this->calendarId . '. Check for proper XML-handling', __METHOD__, TL_ERROR);
+            $this->log('Reloaded ' . $items . ' Events from ckalender to tl_calendar with ID: ' . $this->calendarId . '. Check for proper XML-handling',
+                __METHOD__, TL_ERROR);
         }
 
         // Delete the temporary XML-file from the server
@@ -277,39 +284,7 @@ class CKalenderXmlEventImport extends \System
 
     }
 
-
-    /**
-     * Events that are created in contao habe
-     * @return int
-     */
-    public static function generateUuid()
-    {
-        if(\Input::get('table') != 'tl_calendar_events'){
-            return null;
-        }
-
-        $objDb = \Database::getInstance();
-        if (!$objDb->fieldExists('uuid', 'tl_calendar_events'))
-        {
-            return null;
-        }
-
-        // Generate uuid
-        $uuid = 1000000000;
-        $skip = false;
-        do
-        {
-            $uuid++;
-            $objCal = \CalendarEventsModel::findByUuid($uuid);
-            if ($objCal === null)
-            {
-                $skip = true;
-            }
-        } while ($skip !== true);
-        return $uuid;
-    }
-
-
+   
     /**
      * @param $strDate
      * @param string $format
