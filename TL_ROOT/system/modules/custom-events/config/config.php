@@ -41,3 +41,37 @@ if (TL_MODE == 'FE')
     $GLOBALS['TL_CSS'][] = 'system/modules/custom-events/assets/fonts/star-rating/css/star-rating.css';
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/custom-events/assets/js/custom-events.js';
 }
+
+// !!!!!!!!!!!!!!!!!   IMPORTANT   !!!!!!!!!!!!!!!!!!!!!!!!!
+// The fieldnames for tl_calendar_vents_rating are defined here:
+
+// Ratings
+$GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['ratings'] = array(
+    'ratingPuenktlichkeitDerPromotorenUndErscheinungsbild',
+    'ratingAufbauAbbauVorOrt',
+    'ratingKundenanspruecheDerPromotoren',
+    'ratingKundenfrequenzImShop',
+    'ratingGenerelleAktionsvorbereitungDesShops',
+    'ratingUnterstuetzungImShop',
+    'ratingWetter',
+    'ratingTageszielerreichungUndErwartungen'
+);
+
+// Hardware
+$GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['hardware'] = array(
+    'hardwareSony',
+    'hardwareHuawei',
+    'hardwareSamsung',
+    'hardwareApple',
+    'hardwareSonstige',
+);
+
+// Verträge
+$GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['vertraege'] = array(
+    'vertraegeFestnetz',
+    'vertraegeCreditMobile',
+    'vertraegeVvl',
+    'vertraegeDatenLte',
+    'vertraegeCallYa',
+    'vertraegeCube',
+);

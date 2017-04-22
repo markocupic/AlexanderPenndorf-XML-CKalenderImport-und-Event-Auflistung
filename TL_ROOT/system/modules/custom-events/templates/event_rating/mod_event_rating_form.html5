@@ -16,55 +16,37 @@
         <input type="hidden" name="FORM_SUBMIT" value="formEventRating">
         <input type="hidden" name="REQUEST_TOKEN" value="<?= REQUEST_TOKEN ?>">
 
-
-        <input type="hidden" id="ratingTechnikImShop" class="hidden-star-rating-field" data-regex="integer" name="ratingTechnikImShop" value="0">
-        <input type="hidden" id="ratingAufbauAbbauVorOrt" class="hidden-star-rating-field" data-regex="integer" name="ratingAufbauAbbauVorOrt" value="0">
-        <input type="hidden" id="ratingKundenfrequenzImShop" class="hidden-star-rating-field" data-regex="integer" name="ratingKundenfrequenzImShop" value="0">
-        <input type="hidden" id="ratingZustandShop" class="hidden-star-rating-field" data-regex="integer" name="ratingZustandShop" value="0">
-        <input type="hidden" id="ratingUnterstuetzungImShop" class="hidden-star-rating-field" data-regex="integer" name="ratingUnterstuetzungImShop" value="0">
-        <input type="hidden" id="ratingWetter" class="hidden-star-rating-field" data-regex="integer" name="ratingWetter" value="0">
-
-
-        <div class="form-group">
-            <label for="anzahlDurchgefuehrteBeratungen">Durchgef&uuml;hrte Beratungen:</label>
-            <input type="number" id="anzahlDurchgefuehrteBeratungen" data-regex="integer" name="anzahlDurchgefuehrteBeratungen" value="0">
-        </div>
-
-        <div class="form-group">
-            <label for="anzahlAbgeschlosseneVertraege">Abgeschlossene Vertr&auml;ge:</label>
-            <input type="number" id="anzahlAbgeschlosseneVertraege" data-regex="integer" name="anzahlAbgeschlosseneVertraege" value="0">
-        </div>
-
-        <div class="form-group">
-            <label for="festnetz">Festnetz:</label>
-            <input type="number" id="festnetz" name="festnetz" data-regex="integer" value="0">
-        </div>
-
-        <div class="form-group">
-            <label for="kreditMobile">Kredit Mobile:</label>
-            <input type="number" id="kreditMobile" name="kreditMobile" data-regex="integer" value="0">
-        </div>
-
-        <div class="form-group">
-            <label for="kommentarZumEinsatz">Kommentar zum Einsatz:</label>
-            <textarea class="form-control" id="kommentarZumEinsatz" name="kommentarZumEinsatz" data-regex="text"></textarea>
-        </div>
-
-
+        <?php foreach($GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['ratings'] as $field): ?>
+        <input type="hidden" id="<?= $field ?>" class="hidden-star-rating-field" data-regex="integer" name="<?= $field ?>" value="0">
+        <?php endforeach; ?>
 
         <div class="star-rating-container">
-            <h3>Technik-/Tonqualit&auml;t im Shop:</h3>
-            <div id="stars_ratingTechnikImShop" data-field="ratingTechnikImShop" class="starrr"></div>
-            <h3>Auf- und Abbau vor Ort: </h3>
-            <div id="stars_ratingAufbauAbbauVorOrt" data-field="ratingAufbauAbbauVorOrt" class="starrr"></div>
-            <h3>Kundenfrequenz im Shop:</h3>
-            <div id="stars_ratingKundenfrequenzImShop" data-field="ratingKundenfrequenzImShop" class="starrr"></div>
-            <h3>Shop Zustand:</h3>
-            <div id="stars_ratingZustandShop" data-field="ratingZustandShop" class="starrr"></div>
-            <h3>Unterst&uuml;tzung im Shop:</h3>
-            <div id="stars_ratingUnterstuetzungImShop" data-field="ratingUnterstuetzungImShop" class="starrr"></div>
-            <h3>Wetter: </h3>
-            <div id="stars_ratingWetter" data-field="ratingWetter" class="starrr"></div>
+            <?php foreach($GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['ratings'] as $field): ?>
+            <h3><?= $this->labels[$field][0] ?>:</h3>
+            <div id="stars_<?= $field ?>" data-field="<?= $field ?>" class="starrr"></div>
+            <?php endforeach; ?>
+        </div>
+
+        <h3>Verträge</h3>
+        <?php foreach($GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['vertraege'] as $field): ?>
+        <div class="form-group">
+            <label for="<?= $field ?>"><?= $this->labels[$field][0] ?>:</label>
+            <input type="number" id="<?= $field ?>" data-regex="integer" name="<?= $field ?>" value="0">
+        </div>
+        <?php endforeach; ?>
+
+        <h3>Hardware</h3>
+        <?php foreach($GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['hardware'] as $field): ?>
+        <div class="form-group">
+            <label for="<?= $field ?>"><?= $this->labels[$field][0] ?>:</label>
+            <input type="number" id="<?= $field ?>" data-regex="integer" name="<?= $field ?>" value="0">
+        </div>
+        <?php endforeach; ?>
+
+        <!--<h3>Weitere Infos</h3>-->
+        <div class="form-group">
+            <label for="<?= $field ?>"><?= $this->labels['weitereInfo'][0] ?>:</label>
+            <textarea id="weitereInfo" name="weitereInfo"></textarea>
         </div>
 
         <div class="submit_container">

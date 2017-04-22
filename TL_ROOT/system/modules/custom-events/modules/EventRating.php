@@ -62,12 +62,6 @@ class EventRating extends \Module
         }
 
 
-        // Show to logged in users only!
-        if (!FE_USER_LOGGED_IN)
-        {
-            //return '';
-        }
-
         $this->objUser = \FrontendUser::getInstance();
 
         $objEvent = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
@@ -100,58 +94,53 @@ class EventRating extends \Module
         $this->Template->countRatings = $this->countRatings();
 
         // Star-Rating Values
-        $arrFormInputStarRatings = array('ratingTechnikImShop', 'ratingAufbauAbbauVorOrt', 'ratingKundenfrequenzImShop', 'ratingZustandShop', 'ratingUnterstuetzungImShop', 'ratingWetter');
+        // $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['ratings'] was set in config.php
+        $arrFormInputStarRatings = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['ratings'];
         $averageRatings = array();
         $userRatings = array();
-        foreach($arrFormInputStarRatings as $fieldname)
+        foreach ($arrFormInputStarRatings as $fieldname)
         {
             $averageRatings[$fieldname] = $this->getAverageRating($fieldname, 2);
-            if(FE_USER_LOGGED_IN)
+            if (FE_USER_LOGGED_IN)
             {
                 $userRatings[$fieldname] = $this->getUserRating($fieldname);
             }
         }
         $this->Template->starRatings = $averageRatings;
 
+
         // Other numeric values
-        $arrFormInputNumerics = array('anzahlDurchgefuehrteBeratungen', 'anzahlAbgeschlosseneVertraege', 'festnetz', 'kreditMobile');
+        // $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['vertraege'] was set in config.php
+        $arrFormInputVertraege = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['vertraege'];
         $numericValues = array();
-        foreach($arrFormInputNumerics as $fieldname)
+        foreach ($arrFormInputVertraege as $fieldname)
         {
             $numericValues[$fieldname] = $this->getAverageRating($fieldname, 2);
         }
-        $this->Template->numericValues = $numericValues;
+        $this->Template->vertraege = $numericValues;
 
 
-
-        // Comments
-        $comments = array();
-        $fieldname = 'kommentarZumEinsatz';
-        $objRatings = \CalendarEventsRatingModel::findByPid($this->objEvent->id);
-        if($objRatings !== null)
+        // Other numeric values
+        // $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['hardware'] was set in config.php
+        $arrFormInputHardware = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['hardware'];
+        $numericValues = array();
+        foreach ($arrFormInputHardware as $fieldname)
         {
-            while($objRatings->next())
-            {
-                if($objRatings->{$fieldname} != '')
-                {
-                    $comments[] = nl2br($objRatings->{$fieldname});
-                }
-            }
-
+            $numericValues[$fieldname] = $this->getAverageRating($fieldname, 2);
         }
-        if(count($comments) > 0)
-        {
-            $this->Template->comments = $comments;
-        }
+        $this->Template->hardware = $numericValues;
 
+
+        // Weitere Info
+        $this->Template->weitereInfo = $this->getWeitereInfo();
 
 
         // Logged in user
         $this->Template->objEvent = $this->objEvent;
-        if(FE_USER_LOGGED_IN) {
+        if (FE_USER_LOGGED_IN)
+        {
             $this->Template->objUser = $this->objUser;
         }
-
 
 
         // Labels
@@ -175,6 +164,30 @@ class EventRating extends \Module
     protected function getAverageRating($fieldname, $precision = 2)
     {
         return \CalendarEventsRatingModel::getAverageRating($fieldname, $this->objEvent->id, $precision = 2);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getWeitereInfo()
+    {
+        $arrText = array();
+        $objEventsRating = \CalendarEventsRatingModel::findByPid($this->objEvent->id);
+        if($objEventsRating !== null)
+        {
+            while($objEventsRating->next())
+            {
+                $arrText[] = array(
+                    'authorId' => $objEventsRating->memberId,
+                    'author' => \MemberModel::findByPk($objEventsRating->memberId)->firstname . ' ' . \MemberModel::findByPk($objEventsRating->memberId)->lastname,
+                    'text' => $objEventsRating->weitereInfo,
+                    'tstamp' => $objEventsRating->tstamp
+                );
+            }
+        }
+
+
+        return $arrText;
     }
 
     /**

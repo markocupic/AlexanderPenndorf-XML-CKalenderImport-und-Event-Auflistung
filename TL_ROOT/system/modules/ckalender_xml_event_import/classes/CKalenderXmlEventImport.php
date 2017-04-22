@@ -284,7 +284,7 @@ class CKalenderXmlEventImport extends \System
 
     }
 
-   
+
     /**
      * @param $strDate
      * @param string $format

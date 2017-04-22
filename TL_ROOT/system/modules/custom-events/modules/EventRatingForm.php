@@ -69,9 +69,12 @@ class EventRatingForm extends \Module
         {
 
             $set = array();
-            $arrFormInputStarRatings = array('ratingTechnikImShop', 'ratingAufbauAbbauVorOrt', 'ratingKundenfrequenzImShop', 'ratingZustandShop', 'ratingUnterstuetzungImShop', 'ratingWetter');
-            $arrFormInputNumerics = array('anzahlDurchgefuehrteBeratungen', 'anzahlAbgeschlosseneVertraege', 'festnetz', 'kreditMobile', 'kommentarZumEinsatz');
-            $arrFormInputText = array('kommentarZumEinsatz');
+            $arrFormInputStarRatings = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['ratings'];
+            $arrFormInputVertraege = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['vertraege'];
+            $arrFormInputHardware = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['hardware'];
+            $arrFormInputText = array('weitereInfo');
+
+
             foreach($arrFormInputStarRatings as $fieldname)
             {
                 if(!is_numeric(\Input::post($fieldname)) || \Input::post($fieldname) < 1 || \Input::post($fieldname) > 6)
@@ -82,7 +85,7 @@ class EventRatingForm extends \Module
                 }
             }
 
-            foreach($arrFormInputNumerics as $fieldname)
+            foreach($arrFormInputVertraege as $fieldname)
             {
                 if(!is_numeric(\Input::post($fieldname)) && (int) \Input::post($fieldname) != 0)
                 {
@@ -93,7 +96,18 @@ class EventRatingForm extends \Module
                 }
             }
 
-            $set['kommentarZumEinsatz'] = \Input::post('kommentarZumEinsatz');
+            foreach($arrFormInputHardware as $fieldname)
+            {
+                if(!is_numeric(\Input::post($fieldname)) && (int) \Input::post($fieldname) != 0)
+                {
+                    $this->blnError = true;
+                }
+                else{
+                    $set[$fieldname] = (int) \Input::post($fieldname);
+                }
+            }
+
+            $set['weitereInfo'] = \Input::post('weitereInfo');
 
             if($this->blnError !== true)
             {
@@ -156,7 +170,8 @@ class EventRatingForm extends \Module
      */
     protected function compile()
     {
-
+        $this->loadLanguageFile('tl_calendar_events_rating');
+        $this->Template->labels = $GLOBALS['TL_LANG']['tl_calendar_events_rating'];
     }
 
 }

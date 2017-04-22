@@ -5,30 +5,35 @@
 <?php endif; ?>
 
 <?php if($this->countRatings > 0): ?>
-    <h2>Star-rating</h2>
+    <h2>Durschnittsnoten</h2>
     <?php foreach($this->starRatings as $fieldname => $averageRating): ?>
-    <div class="rating-numeric">Durchschnittswertung für <strong><?= $this->labels[$fieldname][0] ?></strong>: <?= $averageRating ?> Sterne</div>
-    <div class="rating-star"><?= Markocupic\Customevents\Helpers::generateRatingIconHtml('<i class="sr-star"></i>', $averageRating) ?></div>
-    {{br}}
-    <?php endforeach; ?>
-
-    {{br}}
-
-    <h2>Weitere Zahlen</h2>
-    <?php foreach($this->numericValues as $fieldname => $averageRating): ?>
-    <div class="numeric-values"><strong><?= $this->labels[$fieldname][0] ?></strong>: <?= $averageRating ?></div>
-    <?php endforeach; ?>
-
-
-    <?php if($this->comments): ?>
+        <div class="rating-numeric">Durchschnittswertung für <strong><?= $this->labels[$fieldname][0] ?></strong>: <?= $averageRating ?> Sterne</div>
+        <div class="rating-star"><?= Markocupic\Customevents\Helpers::generateRatingIconHtml('<i class="sr-star"></i>', $averageRating) ?></div>
         {{br}}
-        <h2>Bemerkungen/Kommentare</h2>
-        <?php foreach($this->comments as $comment): ?>
-        <div class="rating-comment"><?= $comment ?></div>
-        <?php endforeach; ?>
+    <?php endforeach; ?>
+
+    {{br}}
+
+    <h2>Vertr&auml;ge</h2>
+    <?php foreach($this->vertraege as $fieldname => $number): ?>
+        <div class="numeric-values"><strong><?= $this->labels[$fieldname][0] ?></strong>: <?= $number ?></div>
+    <?php endforeach; ?>
+
+    <h2>Hardware</h2>
+    <?php foreach($this->hardware as $fieldname => $number): ?>
+        <div class="numeric-values"><strong><?= $this->labels[$fieldname][0] ?></strong>: <?= $number ?></div>
+    <?php endforeach; ?>
+
+    <?php if(count($this->weitereInfo)): ?>
+    <h2>Weitere Infos</h2>
+    <?php foreach($this->weitereInfo as $arrInfo): ?>
+        <div class="info-text"><?= nl2br($arrInfo['text']) ?></div>
+        <!--<div class="info-author"><?= $arrInfo['author'] ?></div>-->
+        <!--<div class="info-date"><?= \Date::parse('d.m.Y', $arrInfo['tstamp']) ?></div>-->
+    <?php endforeach; ?>
     <?php endif; ?>
-    <?php else: ?>
-    <div class="no-average-rating">Für diesen Event liegen zur Zeit noch keine Bewertungen vor.</div>
+<?php else: ?>
+<div class="no-average-rating">Für diesen Event liegen zur Zeit noch keine Bewertungen vor.</div>
 <?php endif; ?>
 
 </div>
