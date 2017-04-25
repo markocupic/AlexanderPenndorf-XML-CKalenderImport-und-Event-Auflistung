@@ -1,0 +1,38 @@
+Fuer den Event "<?= $this->eventname ?>" ist von <?= $this->logged_in_user_firstname ?> <?= $this->logged_in_user_lastname ?> soeben ein Rating erstellt worden.
+
+Rating
+<?php foreach ($this->ratings as $rating): ?>
+<?= $rating['label'] ?>: <?= $rating['value'] ?> (Schulnote)
+<?php endforeach; ?>
+
+
+Verträge
+<?php foreach ($this->vertraege as $vertrag): ?>
+<?= $vertrag['label'] ?>: <?= $vertrag['value'] ?>
+
+<?php endforeach; ?>
+
+
+Hardware
+<?php foreach ($this->hardware as $hardware): ?>
+<?= $hardware['label'] ?>: <?= $hardware['value'] ?>
+
+<?php endforeach; ?>
+
+
+
+<?php if($this->weitereInfo): ?>
+Weitere Info:
+<?= $this->weitereInfo ?>
+<?php endif; ?>
+
+
+Hier geht es zum Rating: 
+<?= $this->href ?>
+
+
+Liebe Gruesse
+
+Administrator
+
+PS: Dies ist eine automatisch generierte Nachricht. Bitte antworten Sie nicht darauf.

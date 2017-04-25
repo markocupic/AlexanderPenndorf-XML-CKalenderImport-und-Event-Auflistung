@@ -43,6 +43,7 @@ ClassLoader::addClasses(array
 TemplateLoader::addFiles(array
 (
     'fileupload_email_notification' => 'system/modules/custom-events/templates/fileupload_email_notification',
+    'rating_email_notification' => 'system/modules/custom-events/templates/rating_email_notification',
     'mod_event_gallery' => 'system/modules/custom-events/templates/event_gallery',
     'event_full_custom' => 'system/modules/custom-events/templates/calendar',
     'event_upcoming_custom' => 'system/modules/custom-events/templates/calendar',

@@ -113,6 +113,13 @@ $GLOBALS['TL_DCA']['tl_calendar_events_rating'] = array(
             'inputType' => 'textarea',
             'eval' => array('mandatory' => true),
             'sql' => "mediumtext NULL",
+        ),
+        'notifyUsers' => array(
+            'label' => &$GLOBALS['TL_LANG']['tl_calendar_events_rating']['notifyUsers'],
+            'exclude' => true,
+            'inputType' => 'textarea',
+            'eval' => array('mandatory' => true),
+            'sql' => "mediumtext NULL",
         )
     ),
 );

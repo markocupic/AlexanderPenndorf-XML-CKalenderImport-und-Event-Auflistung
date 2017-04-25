@@ -49,6 +49,11 @@
             <textarea id="weitereInfo" name="weitereInfo"></textarea>
         </div>
 
+        <div class="form-group">
+            <label for="<?= $field ?>"><?= $this->labels['notifyUsers'][0] ?>:</label>
+            <textarea id="notifyUsers" name="notifyUsers"></textarea>
+        </div>
+
         <div class="submit_container">
             <input type="submit" id="ctrl_147" class="submit btn btn-danger" value="Bewertung absenden">
         </div>

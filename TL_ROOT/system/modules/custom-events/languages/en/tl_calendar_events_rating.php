@@ -45,6 +45,7 @@ $GLOBALS['TL_LANG']['tl_calendar_events_rating']['hardwareSonstige'] = array('So
 
 // Fields Weitere Infos
 $GLOBALS['TL_LANG']['tl_calendar_events_rating']['weitereInfo'] = array('Weitere Infos', '');
+$GLOBALS['TL_LANG']['tl_calendar_events_rating']['notifyUsers'] = array('Benutzer per E-Mail benachrichtigen', 'Geben Sie eine Liste mit kommaseparierten E-Mail-Adressen ein.');
 
 
 

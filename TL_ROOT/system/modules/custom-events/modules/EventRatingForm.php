@@ -72,44 +72,49 @@ class EventRatingForm extends \Module
             $arrFormInputStarRatings = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['ratings'];
             $arrFormInputVertraege = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['vertraege'];
             $arrFormInputHardware = $GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['hardware'];
-            $arrFormInputText = array('weitereInfo');
 
 
-            foreach($arrFormInputStarRatings as $fieldname)
+            foreach ($arrFormInputStarRatings as $fieldname)
             {
-                if(!is_numeric(\Input::post($fieldname)) || \Input::post($fieldname) < 1 || \Input::post($fieldname) > 6)
+                if (!is_numeric(\Input::post($fieldname)) || \Input::post($fieldname) < 1 || \Input::post($fieldname) > 6)
                 {
                     $this->blnError = true;
-                }else{
-                    $set[$fieldname] = (int) \Input::post($fieldname);
+                }
+                else
+                {
+                    $set[$fieldname] = (int)\Input::post($fieldname);
                 }
             }
 
-            foreach($arrFormInputVertraege as $fieldname)
+            foreach ($arrFormInputVertraege as $fieldname)
             {
-                if(!is_numeric(\Input::post($fieldname)) && (int) \Input::post($fieldname) != 0)
+                if (!is_numeric(\Input::post($fieldname)) && (int)\Input::post($fieldname) != 0)
                 {
                     $this->blnError = true;
                 }
-                else{
-                    $set[$fieldname] = (int) \Input::post($fieldname);
+                else
+                {
+                    $set[$fieldname] = (int)\Input::post($fieldname);
                 }
             }
 
-            foreach($arrFormInputHardware as $fieldname)
+            foreach ($arrFormInputHardware as $fieldname)
             {
-                if(!is_numeric(\Input::post($fieldname)) && (int) \Input::post($fieldname) != 0)
+                if (!is_numeric(\Input::post($fieldname)) && (int)\Input::post($fieldname) != 0)
                 {
                     $this->blnError = true;
                 }
-                else{
-                    $set[$fieldname] = (int) \Input::post($fieldname);
+                else
+                {
+                    $set[$fieldname] = (int)\Input::post($fieldname);
                 }
             }
 
             $set['weitereInfo'] = \Input::post('weitereInfo');
+            $set['notifyUsers'] = \Input::post('notifyUsers');
 
-            if($this->blnError !== true)
+
+            if ($this->blnError !== true)
             {
                 $objEvents = \CalendarEventsModel::findByIdOrAlias($_GET['events']);
                 if ($objEvents !== null)
@@ -122,6 +127,7 @@ class EventRatingForm extends \Module
                         $set['pid'] = $objEvents->id;
                         $set['tstamp'] = time();
                         $this->Database->prepare('INSERT INTO tl_calendar_events_rating %s')->set($set)->execute();
+                        $this->notifyUsers($set);
                         $this->reload();
                     }
                 }
@@ -172,6 +178,102 @@ class EventRatingForm extends \Module
     {
         $this->loadLanguageFile('tl_calendar_events_rating');
         $this->Template->labels = $GLOBALS['TL_LANG']['tl_calendar_events_rating'];
+    }
+
+
+    /**
+     * @param $set
+     */
+    protected function notifyUsers($set)
+    {
+        $strRecipients = str_replace(' ', '', $set['notifyUsers']);
+        $strRecipients = trim($strRecipients, ',');
+
+        if ($strRecipients == '')
+        {
+            return;
+        }
+        // Sort out duplicate E-Mail-Adresses
+        $arrRecipients = explode(',', $strRecipients);
+        $arrRecipients = array_unique($arrRecipients);
+        if (count($arrRecipients) < 1)
+        {
+            return;
+        }
+
+        $strRecipients = implode(',', $arrRecipients);
+        while (strpos($strRecipients, ',,') !== false)
+        {
+            $strRecipients = str_replace(',,', ',', $strRecipients);
+        }
+
+
+        $objEvent = \CalendarEventsModel::findByPk($set['pid']);
+        if ($objEvent === null)
+        {
+            new \Exception('Event mit id ' . $set['pid'] . ' wurde nicht gefunden.');
+        }
+
+
+        $objTemplate = new \FrontendTemplate('rating_email_notification');
+
+        $objUser = \FrontendUser::getInstance();
+        if ($objUser !== null)
+        {
+            $objTemplate->logged_in_user_firstname = $objUser->firstname;
+            $objTemplate->logged_in_user_lastname = $objUser->lastname;
+        }
+
+        $objTemplate->eventname = $objEvent->title;
+
+        // The url to the newsreader
+        $objTemplate->href = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER[HTTP_HOST] . $_SERVER[REQUEST_URI];
+
+        // Load language for the labels
+        $this->loadLanguageFile('tl_calendar_events_rating');
+
+        // Add ratings to template
+        $arrRatings = array();
+        foreach ($GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['ratings'] as $key)
+        {
+            $arrRatings[] = array(
+                'label' => $GLOBALS['TL_LANG']['tl_calendar_events_rating'][$key][0],
+                'value' => $set[$key]
+            );
+        }
+        $objTemplate->ratings = $arrRatings;
+
+        // Add vertraege to template
+        $arrVertraege = array();
+        foreach ($GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['vertraege'] as $key)
+        {
+            $arrVertraege[] = array(
+                'label' => $GLOBALS['TL_LANG']['tl_calendar_events_rating'][$key][0],
+                'value' => $set[$key]
+            );
+        }
+        $objTemplate->vertraege = $arrVertraege;
+
+        // Add hardware to template
+        $arrHardware = array();
+        foreach ($GLOBALS['TL_CONFIG']['CUSTOM_EVENTS']['hardware'] as $key)
+        {
+            $arrVertraege[] = array(
+                'label' => $GLOBALS['TL_LANG']['tl_calendar_events_rating'][$key][0],
+                'value' => $set[$key]
+            );
+        }
+        $objTemplate->hardware = $arrVertraege;
+
+        // Weitere Info
+        $objTemplate->weitereInfo = $set['weitereInfo'] != '' ? $set['weitereInfo'] : null;
+
+
+        // Email
+        $email = new \Email();
+        $email->subject = 'Neues Rating fuer Event: ' . $objEvent->title;
+        $email->text = $objTemplate->parse();
+        $email->sendTo($strRecipients);
     }
 
 }
